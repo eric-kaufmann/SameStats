@@ -1,1 +1,3 @@
 # SameStats
+
+As in the Paper [*Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics through Simulated Annealing*](https://www.autodesk.com/research/publications/same-stats-different-graphs) by Justin Matejka and George Fitzmaurice introduced, there are datasets with the same statistical properties but dissimilar graphs. The current approach is still very slow because it is written in Python. In this project we wan't to optimize the code using parallel OpenMP C++.

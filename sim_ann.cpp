@@ -64,6 +64,15 @@ void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* sta
     std::cout << "pearson: " << stats->at(4) << std::endl;
 }
 
+bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
+    for(int i = 0; i < stats1->size(); ++i){
+        if( (stats1->at(i) - stats2->at(i)) > error ){
+            return false;
+        }
+    }
+    return true;
+}
+
 int main(int argc, char const *argv[])
 {
     // Initialize the data using a 2D vector (x,y)
@@ -72,9 +81,18 @@ int main(int argc, char const *argv[])
         {2.0, 0.0, -3.0, -2.0} // y values
     };
 
+    std::vector<std::vector<double>> test_data = {
+        {5.0, -2.0, 1.5, 1.0}, // x values
+        {1.5, 3.0, -2.0, -1.5} // y values
+    };
+
     std::vector<double> init_stats(5);
+    std::vector<double> test_stats(5);
 
     calc_stats(&init_data, &init_stats);
+    calc_stats(&test_data, &test_stats);
+
+    std::cout << "stats equal: " << check_stats(&init_stats, &test_stats, 0.5) << std::endl;
 
     //matrixToCSV(&init_stats, "test");
 

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-
+#include <cmath>
 
 void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* stats){
 
@@ -41,6 +41,28 @@ void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* sta
     std::cout << "y_std: " << stats->at(3) << std::endl;
     std::cout << "pearson: " << stats->at(4) << std::endl;
 
+}
+
+//shape daten in 2d vector: 1. vektor mit x koordinaten, 2. vektor mit y koordinaten 
+//shape_size: anzahl punkte
+double minDist(const std::vector<double> v1, const std::vector<std::vector <double>> shape, int shape_size){ 
+    double result=0.0, x_diff, y_diff;
+    double x_vec, y_vec;
+    double buff[shape_size];
+#pragma omp parallel for 
+    for(int i = 0; i < shape_size; i++){
+        x_diff = std::pow((v1[0] - shape[0][i]),2); //quadratischer abstand
+        y_diff = std::pow((v1[1] - shape[1][i]),2); //quadratischer abstand
+        buff[i] = std::sqrt(x_diff+y_diff); //norm
+    }
+#pragma omp for reduction(min:result)
+    for(int i = 0; i < shape_size; i++){
+        result = std::min(result, buff[i]);
+        // if(buff[i]<result)
+        // result = buff[i];   
+    }
+
+     return result;    
 }
 
 int main(int argc, char const *argv[])

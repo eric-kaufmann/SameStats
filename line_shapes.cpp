@@ -1,53 +1,3 @@
-// def get_points_for_shape(line_shape):
-//     lines = []
-//     if line_shape == 'x':
-//         l1 = [[20, 0], [100, 100]]
-//         l2 = [[20, 100], [100, 0]]
-//         lines = [l1, l2]
-//     elif line_shape == "h_lines":
-//         lines = [[[0, y], [100, y]] for y in [10, 30, 50, 70, 90]]
-//     elif line_shape == 'v_lines':
-//         lines = [[[x, 0], [x, 100]] for x in [10, 30, 50, 70, 90]]
-//     elif line_shape == 'wide_lines':
-//         l1 = [[10, 0], [10, 100]]
-//         l2 = [[90, 0], [90, 100]]
-//         lines = [l1, l2]
-//     elif line_shape == 'high_lines':
-//         l1 = [[0, 10], [100, 10]]
-//         l2 = [[0, 90], [100, 90]]
-//         lines = [l1, l2]
-//     elif line_shape == 'slant_up':
-//         l1 = [[0, 0], [100, 100]]
-//         l2 = [[0, 30], [70, 100]]
-//         l3 = [[30, 0], [100, 70]]
-//         l4 = [[50, 0], [100, 50]]
-//         l5 = [[0, 50], [50, 100]]
-//         lines = [l1, l2, l3, l4, l5]
-//     elif line_shape == 'slant_down':
-//         l1 = [[0, 100], [100, 0]]
-//         l2 = [[0, 70], [70, 0]]
-//         l3 = [[30, 100], [100, 30]]
-//         l4 = [[0, 50], [50, 0]]
-//         l5 = [[50, 100], [100, 50]]
-//         lines = [l1, l2, l3, l4, l5]
-//     elif line_shape == 'center':
-//         cx = 54.26
-//         cy = 47.83
-//         l1 = [[cx, cy], [cx, cy]]
-//         lines = [l1]
-//     elif line_shape == 'star':
-//         star_pts = [10,40,40,40,50,10,60,40,90,40,65,60,75,90,50,70,25,90,35,60]
-//         pts = [star_pts[i:i+2] for i in range(0, len(star_pts), 2)]
-//         pts = [[p[0]*0.8 + 20, 100 - p[1]] for p in pts]
-//         pts.append(pts[0])
-//         lines = [pts[i:i+2] for i in range(0, len(pts)-1, 1)]
-//     elif line_shape == 'down_parab':
-//         curve = [[x, -((x-50)/4)**2 + 90] for x in np.arange(0, 100, 3)]
-//         lines = [curve[i:i+2] for i in range(0, len(curve)-1, 1)]
-
-//     return lines
-
-
 #include <vector>
 #include <string>
 #include <math.h>
@@ -69,7 +19,7 @@ std::vector<std::vector<double>> get_points_by_lines(std::vector<std::vector<std
         auto p2 = l[1];
 
         // lam * (x1,y1) + (1-lam) * (x2,y2)
-        for(double lam = 0; lam < 1.0; lam = lam + 1.0/samples_per_line){
+        for(double lam = 0; lam <= 1.0; lam = lam + 1.0/(samples_per_line-1)){
             std::vector<double> new_point = {
                 lam * p1[0] + (1.0-lam) * p2[0],
                 lam * p1[1] + (1.0-lam) * p2[1]
@@ -88,12 +38,11 @@ std::vector<std::vector<double>> get_points_for_shape(std::string shape, int num
 
     if(shape == "x"){
         lines = {
-            {{0.0,0.0},{100.0,100.0}}, // one line starting at (0,0) and ending at (100,100)
-            {{100.0,0.0},{0.0,100.0}}
+            {{20.0,0.0},{100.0,100.0}}, // one line starting at (0,0) and ending at (100,100)
+            {{100.0,0.0},{20.0,100.0}}
         };
     }
     else if (shape == "h_lines"){
-        //lines = [[[0, y], [100, y]] for y in [10, 30, 50, 70, 90]]
         lines = {
             {{0.0,10.0},{100.0,10.0}},
             {{0.0,30.0},{100.0,10.0}},
@@ -102,16 +51,115 @@ std::vector<std::vector<double>> get_points_for_shape(std::string shape, int num
             {{0.0,90.0},{100.0,10.0}},
         };
     }
+    else if (shape == "v_lines"){
+        lines = {
+            {{10.0,0.0},{10.0,100.0}},
+            {{30.0,0.0},{30.0,100.0}},
+            {{50.0,0.0},{50.0,100.0}},
+            {{70.0,0.0},{70.0,100.0}},
+            {{90.0,0.0},{90.0,100.0}},
+        };
+    }
+    else if (shape == "wide_lines"){
+        lines = {
+            {{10.0,0.0},{10.0,100.0}},
+            {{90.0,0.0},{90.0,100.0}},
+        };
+    }
+    else if (shape == "high_lines"){
+        lines = {
+            {{0.0,10.0},{100.0,10.0}},
+            {{0.0,90.0},{100.0,90.0}},
+        };
+    }
+    else if (shape == "slant_up"){
+        lines = {
+            {{0.0,0.0},{100.0,100.0}},
+            {{0.0,30.0},{70.0,100.0}},
+            {{30.0,0.0},{100.0,70.0}},
+            {{50.0,0.0},{100.0,50.0}},
+            {{0.0,50.0},{50.0,100.0}},
+        };
+    }
+    else if (shape == "slant_down"){
+        lines = {
+            {{0.0,100.0},{100.0,0.0}},
+            {{0.0,70.0},{70.0,0.0}},
+            {{30.0,100.0},{100.0,30.0}},
+            {{0.0,50.0},{50.0,0.0}},
+            {{50.0,100.0},{100.0,50.0}},
+        };
+    }
+    else if (shape == "center"){
+        lines = {
+            {{54.26,47.83},{54.26,47.83}},
+        };
+    }
+    else if (shape == "star"){
+        lines = {
+            {{28.0, 60}, {52.0, 60}},
+            {{52.0, 60}, {60.0, 90}},
+            {{60.0, 90}, {68.0, 60}},
+            {{68.0, 60}, {92.0, 60}},
+            {{92.0, 60}, {72.0, 40}},
+            {{72.0, 40}, {80.0, 10}},
+            {{80.0, 10}, {60.0, 30}},
+            {{60.0, 30}, {40.0, 10}},
+            {{40.0, 10}, {48.0, 40}},
+            {{48.0, 40}, {28.0, 60}}
+        };
+    }
+    else if (shape == "down_parab"){
+        lines = {
+            {{0, -66.25}, {3, -48.0625}},
+            {{3, -48.0625}, {6, -31.0}},
+            {{6, -31.0}, {9, -15.0625}},
+            {{9, -15.0625}, {12, -0.25}},
+            {{12, -0.25}, {15, 13.4375}},
+            {{15, 13.4375}, {18, 26.0}},
+            {{18, 26.0}, {21, 37.4375}},
+            {{21, 37.4375}, {24, 47.75}},
+            {{24, 47.75}, {27, 56.9375}},
+            {{27, 56.9375}, {30, 65.0}},
+            {{30, 65.0}, {33, 71.9375}},
+            {{33, 71.9375}, {36, 77.75}},
+            {{36, 77.75}, {39, 82.4375}},
+            {{39, 82.4375}, {42, 86.0}},
+            {{42, 86.0}, {45, 88.4375}},
+            {{45, 88.4375}, {48, 89.75}},
+            {{48, 89.75}, {51, 89.9375}},
+            {{51, 89.9375}, {54, 89.0}},
+            {{54, 89.0}, {57, 86.9375}},
+            {{57, 86.9375}, {60, 83.75}},
+            {{60, 83.75}, {63, 79.4375}},
+            {{63, 79.4375}, {66, 74.0}},
+            {{66, 74.0}, {69, 67.4375}},
+            {{69, 67.4375}, {72, 59.75}},
+            {{72, 59.75}, {75, 50.9375}},
+            {{75, 50.9375}, {78, 41.0}},
+            {{78, 41.0}, {81, 29.9375}},
+            {{81, 29.9375}, {84, 17.75}},
+            {{84, 17.75}, {87, 4.4375}},
+            {{87, 4.4375}, {90, -10.0}},
+            {{90, -10.0}, {93, -25.5625}},
+            {{93, -25.5625}, {96, -42.25}},
+            {{96, -42.25}, {99, -60.0625}}
+        };
+    }
 
     // generate target data
     std::vector<std::vector<double>> target_data = get_points_by_lines(lines, num_samples);
 
-    for(auto p : target_data){
-        std::cout << p[0] << "  " << p[1] << std::endl;
-    }
+    // for(auto p : target_data){
+    //     std::cout << p[0] << "  " << p[1] << std::endl;
+    // }
     return target_data;
 }
 
 int main(){
-    std::vector<std::vector<double>> temp = get_points_for_shape("h_lines", 50);
+    std::vector<std::string> shapes = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
+    for(auto s : shapes){
+        std::vector<std::vector<double>> temp = get_points_for_shape("h_lines", 100000);
+        std::cout << "worked for " << s << " num datapoints: " << temp.size() <<std::endl;
+    }
 }

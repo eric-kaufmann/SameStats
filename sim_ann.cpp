@@ -7,7 +7,7 @@
 #include <line_shapes.h>
 
 
-void matrixToCSV(std::vector<std::vector<double>>* data, std::string filename)
+void data_to_csv(std::vector<std::vector<double>>* data, std::string filename)
 {
     std::ofstream outfile;
     outfile.open(filename);
@@ -19,7 +19,7 @@ void matrixToCSV(std::vector<std::vector<double>>* data, std::string filename)
     outfile.close();
 }
 
-void generateScatterPlots(){
+void generate_scatter_plot(){
     system("python3 scatter_plot.py");
 }
 
@@ -99,6 +99,8 @@ bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, doubl
 }
 
 int main(int argc, char const *argv[]){
+
+    bool save_data = true; // generates csv files and plots data
 
     int num_steps = 10; // number of iteration steps
     double error = 10e-2; // maximum statistical diffence
@@ -218,6 +220,12 @@ int main(int argc, char const *argv[]){
         if(init_temperature/(step+1) > min_temperature){
             temperature = init_temperature/(step+1);
         }
+    }
+
+    if(save_data){
+        data_to_csv(&working_data, "generated_data.csv");
+        data_to_csv(&working_data, "target_data.csv");
+        generate_scatter_plot();
     }
 
     return 0;

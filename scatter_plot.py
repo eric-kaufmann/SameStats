@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 
 # read the CSV file and create a list of (x, y) coordinates
 best = []
-with open('best_matrix.csv') as csvfile:
+with open('generated_data.csv') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         best.append((float(row[0]), float(row[1])))
 
 target = []
-with open('target_matrix.csv') as csvfile:
+with open('target_data.csv') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         target.append((float(row[0]), float(row[1])))

@@ -124,17 +124,17 @@ int main(int argc, char const *argv[]){
     else if (init_shape == "random"){
         working_data = generate_point_cloud(num_samples);
     }
+
     // All possible target shapes 
     // {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-
     std::string target_shape = "x";
-
     std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape, working_data.size());
 
     // Transpose data
-
-    working_data = transpose_data(working_data);
-    target_data = transpose_data(target_data);
+    if(transpose){
+        working_data = transpose_data(working_data);
+        target_data = transpose_data(target_data);
+    }
 
     // // target points
     // std::vector<std::vector<double>> target_data = {
@@ -153,16 +153,20 @@ int main(int argc, char const *argv[]){
 
     // Calculate initial stats
     std::vector<double> init_stats(5); 
-    std::vector<double> working_stats(5); // will change later
+    std::vector<double> working_stats(5);
     std::vector<double> target_stats(5);
 
-    calc_stats(&working_data, &init_stats); 
-    calc_stats(&target_data, &target_stats);
+    calc_stats(&working_data, &init_stats); // set initial stats
+    calc_stats(&target_data, &target_stats); // set target stats
 
 
-    // create radom number generators
+    // create radom number generator
     std::default_random_engine generator;
-    std::uniform_int_distribution<int> rand_point_dist(0,working_data[0].size());
+
+    // init distributions
+    std::uniform_int_distribution<int> rand_point_dist(0,working_data[0].size()); // selects a rondom point idx
+    std::normal_distribution<double> rand_shift(0.0,max_shift); // generates shift for points
+    std::uniform_real_distribution<> rand_break(0.0, 1.0); // gives a chance to break out of loop
 
     double temperature = init_temperature;
 
@@ -174,12 +178,8 @@ int main(int argc, char const *argv[]){
         double rpx = working_data[0][rand_point_idx]; // x value of random point
         double rpy = working_data[1][rand_point_idx]; // y value of random point
         
-        // TODO: calculate initial min dist
-        double init_min_dist = 0.3;
-
-        // init normal distributions
-        std::normal_distribution<double> rand_shift(0.0,max_shift); // generates shift for points
-        std::uniform_real_distribution<> rand_break(0.0, 1.0); // gives a chance to break out of loop
+        // TODO: calculate initial min dist from (rpx, rpy) to target_data
+        double init_min_dist = 0.3; 
 
         // Get new point with smaller distance
         double new_min_dist = INFINITY;
@@ -192,7 +192,7 @@ int main(int argc, char const *argv[]){
             std::cout << "random shift " << rpx_shift << "  " << rpy_shift << std::endl;
             std::cout <<  std::endl;
             
-            // TODO: calculate new min dist from (rpx_shift, rpy_shift) to other points from target_data
+            // TODO: calculate new min dist from (rpx_shift, rpy_shift) to target_data
             new_min_dist = 0.001;
             
             // simmulated annealing: break out of loop with a specific chance

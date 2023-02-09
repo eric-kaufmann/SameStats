@@ -322,6 +322,14 @@ std::vector<std::vector<double>> generate_point_cloud(int num_samples){
     return data;
 }
 
+void print_matrix(std::vector<std::vector<double>> data){
+    for (int i = 0; i < data.size(); i++) {
+        for (int j = 0; j < data[i].size(); j++)
+            std::cout << data[i][j] << " ";
+        std::cout << std::endl;
+    }
+}
+
 std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>> data){
     std::vector<double> x_vals;
     std::vector<double> y_vals;
@@ -330,8 +338,11 @@ std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>>
         x_vals.push_back(p[0]);
         y_vals.push_back(p[1]);
     }
-    std::vector<std::vector<double>> data = {x_vals, y_vals};
-    return data;
+    std::vector<std::vector<double>> data_T;
+    data_T.push_back(x_vals);
+    data_T.push_back(y_vals);
+
+    return data_T;
 }
 
 
@@ -346,4 +357,21 @@ int main(){
     std::cout << "worked for datasaurus " << " num datapoints: " << temp.size() <<std::endl;
     temp = generate_point_cloud(100000);
     std::cout << "worked for random point cloud  num datapoints: " << temp.size() <<std::endl;
+
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+
+    std::vector<std::vector<double>> data = {
+        {2.0,5.0},
+        {3.0,9.0},
+        {1.0,8.0},
+    };
+    std::vector<std::vector<double>> data_T = transpose_data(data);
+
+    std::cout << std::endl;
+    print_matrix(data);
+    std::cout << std::endl;
+    print_matrix(data_T);
+
+
 }

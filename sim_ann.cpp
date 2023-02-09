@@ -110,8 +110,10 @@ int main(int argc, char const *argv[]){
     int num_steps = 10;
     double error = 10e-2;
     double max_shift = 10e-3;
-    double temperature = 10e-4;
     int num_samples = 100000;
+    
+    double init_temperature = 1.0; // initial temperature (gets smaller every iteration)
+    double min_temperature = 0.0; // minimal temperature (always temperature > min_temperature)
 
     std::string target_shape = "x";
 
@@ -147,6 +149,8 @@ int main(int argc, char const *argv[]){
     // create radom number generators
     std::default_random_engine generator;
     std::uniform_int_distribution<int> rand_point_dist(0,working_data[0].size());
+
+    double temperature = init_temperature;
 
     // Main loop over num_steps steps
     for(int step=0; step<num_steps; ++step){
@@ -196,6 +200,11 @@ int main(int argc, char const *argv[]){
             // not the same -> return points to old value
             working_data[0][rand_point_idx] = rpx;
             working_data[1][rand_point_idx] = rpy;
+        }
+
+        // Adjust temperature for simulated annealing
+        if(init_temperature/(step+1) > min_temperature){
+            temperature = init_temperature/(step+1);
         }
     }
 

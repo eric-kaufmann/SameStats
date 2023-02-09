@@ -127,30 +127,28 @@ int main(int argc, char const *argv[]){
     std::vector<double> target_stats(5);
 
     // Initialize the data using a 2D vector (x,y)
-    std::vector<std::vector<double>> working_data = {
-        {3.0, 2.0, 0.0, 1.0}, // x values
-        {2.0, 0.0, -3.0, -2.0} // y values
-    };
+    std::vector<std::vector<double>> working_data = get_datasaurus_data();
 
-    // // data for checking
-    // std::vector<std::vector<double>> test_data = {
-    //     {5.0, -2.0, 1.5, 1.0}, // x values
-    //     {1.5, 3.0, -2.0, -1.5} // y values
+    // std::vector<std::vector<double>> working_data = {
+    //     {3.0, 2.0, 0.0, 1.0}, // x values
+    //     {2.0, 0.0, -3.0, -2.0} // y values
     // };
 
 
-    std::vector<double> init_stats(5); // initial stats
-    std::vector<double> working_stats(5); // stats of p
+    // Calculate initial stats
+    std::vector<double> init_stats(5); 
+    std::vector<double> working_stats(5); // will change later
+    std::vector<double> target_stats(5);
 
     calc_stats(&working_data, &init_stats); 
     calc_stats(&target_data, &target_stats);
 
-    // std::cout << "stats equal: " << check_stats(&init_stats, &test_stats, 0.5) << std::endl;
 
+    // create radom number generators
     std::default_random_engine generator;
     std::uniform_int_distribution<int> rand_point_dist(0,working_data[0].size());
 
-    // do num_steps iterations
+    // Main loop over num_steps steps
     for(int step=0; step<num_steps; ++step){
         // get random point
         int rand_point_idx = rand_point_dist(generator);
@@ -165,6 +163,7 @@ int main(int argc, char const *argv[]){
         std::normal_distribution<double> rand_shift(0.0,max_shift); // generates shift for points
         std::uniform_real_distribution<> rand_break(0.0, 1.0); // gives a chance to break out of loop
 
+        // Get new point with smaller distance
         double new_min_dist = INFINITY;
         double rpx_shift; // x value of random point with shift
         double rpy_shift; // y value of random point with shift
@@ -175,10 +174,10 @@ int main(int argc, char const *argv[]){
             std::cout << "random shift " << rpx_shift << "  " << rpy_shift << std::endl;
             std::cout <<  std::endl;
             
-            // TODO: calculate new min dist from (rpx_shift, rpy_shift) to other points
+            // TODO: calculate new min dist from (rpx_shift, rpy_shift) to other points from target_data
             new_min_dist = 0.001;
             
-            // break even if new_min_dist is still bigger
+            // simmulated annealing: break out of loop with a specific chance
             if(rand_break(generator)<temperature){
                 std::cout << "BREAK" << std::endl;
                 break;
@@ -192,9 +191,9 @@ int main(int argc, char const *argv[]){
         // calc new stats
         calc_stats(&working_data, &working_stats);
 
-        // check if statistics are to an error the same
-        if(!check_stats(&working_stats, &target_stats, error)){
-            // not equal -> return points to old value
+        // check if statistics are ca. the same to our inital stats
+        if(!check_stats(&working_stats, &init_stats, error)){
+            // not the same -> return points to old value
             working_data[0][rand_point_idx] = rpx;
             working_data[1][rand_point_idx] = rpy;
         }

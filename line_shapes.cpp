@@ -3,7 +3,7 @@
 #include <math.h>
 #include <iostream>
 #include <random>
-
+#include "line_shapes.h"
 
 /***
  * calculates distributed points on defined lines
@@ -16,13 +16,13 @@ std::vector<std::vector<double>> get_points_by_lines(std::vector<std::vector<std
     int samples_per_line = num_samples / num_lines;
 
     for(auto l : lines){
-        auto p1 = l[0];
-        auto p2 = l[1];
+        auto p1 = l[0]; // anfangspunkt linie
+        auto p2 = l[1]; //endpunkt linie
 
         // lam * (x1,y1) + (1-lam) * (x2,y2)
-        for(double lam = 0; lam <= 1.0; lam = lam + 1.0/(samples_per_line-1)){
+        for(double lam = 0; lam <= 1.0; lam = lam + 1.0/(samples_per_line-1)){ //generiert äquidistante punkte entlang der linie
             std::vector<double> new_point = {
-                lam * p1[0] + (1.0-lam) * p2[0],
+                lam * p1[0] + (1.0-lam) * p2[0], //p1[0] ist eine koordinate des anfangspunktes
                 lam * p1[1] + (1.0-lam) * p2[1]
             };
             new_data.push_back(new_point);
@@ -45,11 +45,11 @@ std::vector<std::vector<double>> get_points_for_shape(std::string shape, int num
     }
     else if (shape == "h_lines"){
         lines = {
-            {{0.0,10.0},{100.0,10.0}},
-            {{0.0,30.0},{100.0,10.0}},
-            {{0.0,50.0},{100.0,10.0}},
-            {{0.0,70.0},{100.0,10.0}},
-            {{0.0,90.0},{100.0,10.0}},
+            {{0.0,10.0},{100.0,10.0}}, 
+            {{0.0,30.0},{100.0,10.0}}, //y koordiante anpassen? 
+            {{0.0,50.0},{100.0,10.0}}, //y koordiante anpassen? 
+            {{0.0,70.0},{100.0,10.0}}, //y koordiante anpassen? 
+            {{0.0,90.0},{100.0,10.0}}, //y koordiante anpassen? 
         };
     }
     else if (shape == "v_lines"){
@@ -319,7 +319,7 @@ std::vector<std::vector<double>> generate_point_cloud(int num_samples){
         };
         data.push_back(new_point);
     }
-    return data;
+    return data; //Zufällige gleichverteilte Daten x aus [0,100] und y aus [0,100] 
 }
 
 void print_matrix(std::vector<std::vector<double>> data){
@@ -346,32 +346,32 @@ std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>>
 }
 
 
-int main(){
-    std::vector<std::vector<double>> temp;
-    std::vector<std::string> shapes = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    for(auto s : shapes){
-        temp = get_points_for_shape("h_lines", 100000);
-        std::cout << "worked for " << s << " num datapoints: " << temp.size() <<std::endl;
-    }
-    temp = get_datasaurus_data();
-    std::cout << "worked for datasaurus " << " num datapoints: " << temp.size() <<std::endl;
-    temp = generate_point_cloud(100000);
-    std::cout << "worked for random point cloud  num datapoints: " << temp.size() <<std::endl;
+// int main(){
+//     std::vector<std::vector<double>> temp;
+//     std::vector<std::string> shapes = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
+//     for(auto s : shapes){
+//         temp = get_points_for_shape("h_lines", 100000);
+//         std::cout << "worked for " << s << " num datapoints: " << temp.size() <<std::endl;
+//     }
+//     temp = get_datasaurus_data();
+//     std::cout << "worked for datasaurus " << " num datapoints: " << temp.size() <<std::endl;
+//     temp = generate_point_cloud(100000);
+//     std::cout << "worked for random point cloud  num datapoints: " << temp.size() <<std::endl;
 
-    // std::cout << std::endl;
-    // std::cout << std::endl;
+//     // std::cout << std::endl;
+//     // std::cout << std::endl;
 
-    std::vector<std::vector<double>> data = {
-        {2.0,5.0},
-        {3.0,9.0},
-        {1.0,8.0},
-    };
-    std::vector<std::vector<double>> data_T = transpose_data(data);
+//     std::vector<std::vector<double>> data = {
+//         {2.0,5.0},
+//         {3.0,9.0},
+//         {1.0,8.0},
+//     };
+//     std::vector<std::vector<double>> data_T = transpose_data(data);
 
-    std::cout << std::endl;
-    print_matrix(data);
-    std::cout << std::endl;
-    print_matrix(data_T);
+//     std::cout << std::endl;
+//     print_matrix(data);
+//     std::cout << std::endl;
+//     print_matrix(data_T);
 
 
-}
+// }

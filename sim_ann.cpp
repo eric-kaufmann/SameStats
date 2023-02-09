@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 #include <random>
-#include <line_shapes.h>
+#include "line_shapes.h"
 
 
 void data_to_csv(std::vector<std::vector<double>>* data, std::string filename)
@@ -67,7 +67,7 @@ void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* sta
 }
 
 //shape daten in 2d vector: 1. vektor mit x koordinaten, 2. vektor mit y koordinaten 
-// //shape_size: anzahl punkte
+//shape_size: anzahl punkte
 double minDist(const std::vector<double> v1, const std::vector<std::vector <double>> shape, int shape_size){ 
     double result=0.0, x_diff, y_diff;
     double x_vec, y_vec;
@@ -78,14 +78,13 @@ double minDist(const std::vector<double> v1, const std::vector<std::vector <doub
         y_diff = std::pow((v1[1] - shape[1][i]),2); //quadratischer abstand
         buff[i] = std::sqrt(x_diff+y_diff); //norm
     }
-#pragma omp for reduction(min:result)
+#pragma omp parallel for reduction(min:result)
     for(int i = 0; i < shape_size; i++){
-        result = std::min(result, buff[i]);
-        // if(buff[i]<result)
-        // result = buff[i];   
+        // result = std::min(result, buff[i]);
+        if(buff[i]<result)
+            result = buff[i];   
     }
-
-     return result;    
+    return result;    
 }
 
 

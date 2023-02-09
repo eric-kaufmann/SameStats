@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <random>
+#include <line_shapes.h>
 
 
 void matrixToCSV(std::vector<std::vector<double>>* data, std::string filename)
@@ -110,12 +111,17 @@ int main(int argc, char const *argv[]){
     double error = 10e-2;
     double max_shift = 10e-3;
     double temperature = 10e-4;
+    int num_samples = 100000;
 
-    // target points
-    std::vector<std::vector<double>> target_data = {
-        {1.0, 2.0, -1.0, 0.0}, // x values
-        {1.0, 2.0, -1.0, 0.0} // y values
-    };
+    std::string target_shape = "x";
+
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape, num_samples);
+
+    // // target points
+    // std::vector<std::vector<double>> target_data = {
+    //     {1.0, 2.0, -1.0, 0.0}, // x values
+    //     {1.0, 2.0, -1.0, 0.0} // y values
+    // };
 
     // calc stats of target points
     std::vector<double> target_stats(5);
@@ -136,7 +142,7 @@ int main(int argc, char const *argv[]){
     std::vector<double> init_stats(5); // initial stats
     std::vector<double> working_stats(5); // stats of p
 
-    calc_stats(&working_data, &init_stats);
+    calc_stats(&working_data, &init_stats); 
     calc_stats(&target_data, &target_stats);
 
     // std::cout << "stats equal: " << check_stats(&init_stats, &test_stats, 0.5) << std::endl;

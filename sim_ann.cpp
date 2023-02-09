@@ -98,26 +98,41 @@ bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, doubl
     return true;
 }
 
-/***
- * Generate a point cloud based on given statistics
-*/
-void generate_point_cloud(std::vector<double>* stats){
-    
-}
-
 int main(int argc, char const *argv[]){
 
-    int num_steps = 10;
-    double error = 10e-2;
-    double max_shift = 10e-3;
-    int num_samples = 100000;
+    int num_steps = 10; // number of iteration steps
+    double error = 10e-2; // maximum statistical diffence
+    double max_shift = 10e-3; // std of rand-norm for data point shift
+    int num_samples = 100000; // #datapoints if a random point cloud is generated
+    
+    // set data format by transposing data
+    // true -> {{x1,y1}, {x2,y2}, ...} :: false -> {{x1, x2, ...}, {y1, y2, ...}}
+    bool transpose = true;
     
     double init_temperature = 1.0; // initial temperature (gets smaller every iteration)
     double min_temperature = 0.0; // minimal temperature (always temperature > min_temperature)
+   
+    // All possible init shapes 
+    // {"datasaurus", "random"};
+    std::string init_shape = "datasaurus";
+    std::vector<std::vector<double>> working_data;
+    if (init_shape == "datasaurus"){
+        working_data = get_datasaurus_data();
+    } 
+    else if (init_shape == "random"){
+        working_data = generate_point_cloud(num_samples);
+    }
+    // All possible target shapes 
+    // {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
 
     std::string target_shape = "x";
 
-    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape, num_samples);
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape, working_data.size());
+
+    // Transpose data
+
+    working_data = transpose_data(working_data);
+    target_data = transpose_data(target_data);
 
     // // target points
     // std::vector<std::vector<double>> target_data = {
@@ -125,11 +140,8 @@ int main(int argc, char const *argv[]){
     //     {1.0, 2.0, -1.0, 0.0} // y values
     // };
 
-    // calc stats of target points
-    std::vector<double> target_stats(5);
-
     // Initialize the data using a 2D vector (x,y)
-    std::vector<std::vector<double>> working_data = get_datasaurus_data();
+
 
     // std::vector<std::vector<double>> working_data = {
     //     {3.0, 2.0, 0.0, 1.0}, // x values

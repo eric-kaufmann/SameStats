@@ -2,6 +2,7 @@
 #include <string>
 #include <math.h>
 #include <iostream>
+#include <random>
 
 
 /***
@@ -303,13 +304,46 @@ std::vector<std::vector<double>> get_datasaurus_data(){
     return data;
 }
 
+/***
+ * Generate a point cloud based on given statistics
+*/
+std::vector<std::vector<double>> generate_point_cloud(int num_samples){
+    std::vector<std::vector<double>> data;
+
+    std::default_random_engine generator;
+    std::uniform_real_distribution<> rand_value(0.0, 100.0);
+    for (int i = 0; i<num_samples; ++i){
+        std::vector<double> new_point = {
+            rand_value(generator),
+            rand_value(generator),
+        };
+        data.push_back(new_point);
+    }
+    return data;
+}
+
+std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>> data){
+    std::vector<double> x_vals;
+    std::vector<double> y_vals;
+
+    for (auto p : data){
+        x_vals.push_back(p[0]);
+        y_vals.push_back(p[1]);
+    }
+    std::vector<std::vector<double>> data = {x_vals, y_vals};
+    return data;
+}
+
 
 int main(){
+    std::vector<std::vector<double>> temp;
     std::vector<std::string> shapes = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
     for(auto s : shapes){
-        std::vector<std::vector<double>> temp = get_points_for_shape("h_lines", 100000);
+        temp = get_points_for_shape("h_lines", 100000);
         std::cout << "worked for " << s << " num datapoints: " << temp.size() <<std::endl;
     }
-    std::vector<std::vector<double>> temp = get_datasaurus_data();
+    temp = get_datasaurus_data();
     std::cout << "worked for datasaurus " << " num datapoints: " << temp.size() <<std::endl;
+    temp = generate_point_cloud(100000);
+    std::cout << "worked for random point cloud  num datapoints: " << temp.size() <<std::endl;
 }

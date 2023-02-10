@@ -1,4 +1,4 @@
-#include "sim_ann.h"
+#include "line_shapes.h"
 
 /***
  * calculates distributed points on defined lines
@@ -174,7 +174,7 @@ std::vector<std::vector<double>> get_datasaurus_data(){
         {40.2564, 51.4103},
         {44.1026, 52.9487},
         {46.6667, 54.1026},
-        {50.    , 55.2564},
+        {50.0    , 55.2564},
         {53.0769, 55.641 },
         {56.6667, 56.0256},
         {59.2308, 57.9487},
@@ -192,13 +192,13 @@ std::vector<std::vector<double>> get_datasaurus_data(){
         {38.7179, 31.4103},
         {35.1282, 30.2564},
         {32.5641, 32.1795},
-        {30.    , 36.7949},
+        {30.0    , 36.7949},
         {33.5897, 41.4103},
         {36.6667, 45.641 },
         {38.2051, 49.1026},
         {29.7436, 36.0256},
         {29.7436, 32.1795},
-        {30.    , 29.1026},
+        {30.0    , 29.1026},
         {32.0513, 26.7949},
         {35.8974, 25.2564},
         {41.0256, 25.2564},
@@ -219,14 +219,14 @@ std::vector<std::vector<double>> get_datasaurus_data(){
         {69.4872, 69.4872},
         {46.9231, 79.8718},
         {48.2051, 84.1026},
-        {50.    , 85.2564},
+        {50.0    , 85.2564},
         {53.0769, 85.2564},
         {55.3846, 86.0256},
         {56.6667, 86.0256},
         {56.1538, 82.9487},
         {53.8462, 80.641 },
         {51.2821, 78.718 },
-        {50.    , 78.718 },
+        {50.0    , 78.718 },
         {47.9487, 77.5641},
         {29.7436, 59.8718},
         {29.7436, 62.1795},
@@ -280,7 +280,7 @@ std::vector<std::vector<double>> get_datasaurus_data(){
         {50.5128,  9.4872},
         {53.8462, 10.2564},
         {57.4359, 10.2564},
-        {60.    , 10.641 },
+        {60.0    , 10.641 },
         {64.1026, 10.641 },
         {66.9231, 10.641 },
         {71.2821, 10.641 },
@@ -292,8 +292,8 @@ std::vector<std::vector<double>> get_datasaurus_data(){
         {37.6923, 25.7692},
         {39.4872, 25.3846},
         {91.2821, 41.5385},
-        {50.    , 95.7692},
-        {47.9487, 95.    },
+        {50.0    , 95.7692},
+        {47.9487, 95.0    },
         {44.1026, 92.6923}
     };
     return data;
@@ -315,117 +315,4 @@ std::vector<std::vector<double>> generate_point_cloud(int num_samples){
         data.push_back(new_point);
     }
     return data; //Zufällige gleichverteilte Daten x aus [0,100] und y aus [0,100] 
-}
-
-void print_matrix(std::vector<std::vector<double>> data){ // gesammelte x,y koordinaten falls transpose = false
-    for (int i = 0; i < data.size(); i++) {
-        for (int j = 0; j < data[i].size(); j++)
-            std::cout << data[i][j] << " ";
-        std::cout << std::endl;
-    }
-}
-
-std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>> data){
-    std::vector<double> x_vals;
-    std::vector<double> y_vals;
-
-    for (auto p : data){
-        x_vals.push_back(p[0]);
-        y_vals.push_back(p[1]);
-    }
-    std::vector<std::vector<double>> data_T;
-    data_T.push_back(x_vals);
-    data_T.push_back(y_vals);
-
-    return data_T;
-}
-
-
-void data_to_csv(std::vector<std::vector<double>> data, std::string filename) //assuming data in format {{x1, x2, ...}, {y1, y2, ...}}
-{
-    std::ofstream outfile;
-    outfile.open(filename);
-    std::cout << "data[0].size() " << data[0].size() << " data[1].size() " << data[1].size() << std::endl;
-    for(int i = 0; i < data[0].size(); i++){
-        outfile << data[0][i] << "," << data[1][i] << "\n";
-    }
-    outfile.close();
-}
-
-void generate_scatter_plot(){
-    system("python3 scatter_plot.py");
-}
-
-
-void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* stats){
-
-    double x_mean = 0;
-    double y_mean = 0;
-    double x_std = 0;
-    double y_std = 0;
-    double pearson = 0;
-
-    int num_points = (data->at(0)).size();
-
-    for(int i=0; i<num_points; ++i){
-        x_mean += (data->at(0))[i];
-        y_mean += (data->at(1))[i];
-    } 
-    x_mean = x_mean / num_points;
-    y_mean = y_mean / num_points;
-
-    for(int i=0; i<num_points; ++i){
-        x_std += pow((data->at(0))[i] - x_mean, 2);
-        y_std += pow((data->at(1))[i] - x_mean, 2);
-    } 
-    x_std = sqrt(x_std / num_points);
-    y_std = sqrt(y_std / num_points);
-
-
-    for(int i=0; i<num_points; ++i){
-        pearson += ((data->at(0))[i] - x_mean)*((data->at(1))[i] - y_mean) / (num_points * x_std * y_std);
-    } 
-
-    stats->at(0) = x_mean;
-    stats->at(1) = y_mean;
-    stats->at(2) = x_std;
-    stats->at(3) = y_std;
-    stats->at(4) = pearson;
-
-//     std::cout << "x_mean: " << stats->at(0) << std::endl;
-//     std::cout << "y_mean: " << stats->at(1) << std::endl;
-//     std::cout << "x_std: " << stats->at(2) << std::endl;
-//     std::cout << "y_std: " << stats->at(3) << std::endl;
-//     std::cout << "pearson: " << stats->at(4) << std::endl;
-}
-
-//shape daten in 2d vector: 1. vektor mit x koordinaten, 2. vektor mit y koordinaten 
-//shape_size: anzahl punkte
-double minDist(const std::vector<double> v1, const std::vector<std::vector <double>> shape, int shape_size){ 
-    double result=INFINITY;
-    double x_diff, y_diff;
-    double buff[shape_size];
-// #pragma omp parallel for shared(buff)
-    for(int i = 0; i < shape_size; i++){
-        x_diff = std::pow((v1[0] - shape[0][i]),2); //quadratic difference
-        y_diff = std::pow((v1[1] - shape[1][i]),2); //quadratic difference
-        buff[i] = std::sqrt(x_diff+y_diff); //norm
-    }
-// #pragma omp parallel for reduction(min:result)
-    for(int i = 0; i < shape_size; i++){
-        // result = std::min(result, buff[i]);
-        if(buff[i]<result)
-            result = buff[i];   
-    }
-    return result;    
-}
-
-
-bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
-    for(int i = 0; i < stats1->size(); ++i){
-        if( (stats1->at(i) - stats2->at(i)) > error ){
-            return false;
-        }
-    }
-    return true;
 }

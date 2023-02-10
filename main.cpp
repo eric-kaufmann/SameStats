@@ -1,15 +1,15 @@
-#include "sim_ann.h"
+#include "utils.h"
+#include "line_shapes.h"
 
 
 int main(int argc, char const *argv[]){
 
     bool save_data = true; // generates csv files and plots data
 
-    int num_steps = 2e2; // number of iteration steps
+    int num_steps = 1e4; // number of iteration steps
     double error = 1e-2; // maximum statistical diffence
     double max_shift = 5; // std of rand-norm for data point shift 
-    //warum 0.01?
-    int num_samples = 100000; // #datapoints if a random point cloud is generated
+    int num_samples = 100; // #datapoints if a random point cloud is generated
     
     // set data format by transposing data
     // true -> {{x1, x2, ...}, {y1, y2, ...}} :: false -> {{x1,y1}, {x2,y2}, ...} 
@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]){
    
     // All possible init shapes 
     // {"datasaurus", "random"};
-    std::string init_shape = "datasaurus";
+    std::string init_shape = "random";
     // std::string init_shape = "random";
     std::vector<std::vector<double>> working_data;
     if (init_shape == "datasaurus"){
@@ -32,16 +32,21 @@ int main(int argc, char const *argv[]){
 
     // All possible target shapes 
     // {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    std::vector<std::string> target_shape = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[1], working_data.size());
-    // std::cout << "working data: " << std::endl;
-    // print_matrix(working_data);
-    // std::cout << std::endl << "target data: " << std::endl;
-    // print_matrix(target_data);
+    std::string target_shape = "slant_up";
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape, working_data.size());
+
     // Transpose data
     if(transpose){
         working_data = transpose_data(working_data);
         target_data = transpose_data(target_data);
+    }
+
+    // Save Input data
+    if(save_data){
+        std::string fn = "input";
+        data_to_csv(working_data, fn+"_generated_data.csv");
+        data_to_csv(target_data, fn+"_target_data.csv");
+        generate_scatter_plot(fn);
     }
 
     // Calculate initial stats
@@ -67,19 +72,17 @@ int main(int argc, char const *argv[]){
     int counter = 0;
     // Main loop over num_steps steps
     for(int step=0; step<num_steps; ++step){
-        std::cout << "step: " << step << std::endl;
+        if (step % 1000==0){
+            std::cout << "step: " << step << std::endl;
+        }
         // get random point
         int rand_point_idx = rand_point_dist(generator);
-        // std::cout << "random point " << working_data[0][rand_point_idx] << "  " << working_data[1][rand_point_idx] << std::endl;
         double rpx = working_data[0][rand_point_idx]; // x value of random point
         double rpy = working_data[1][rand_point_idx]; // y value of random point
-        //funktioniert der zugriff so auch wenn transpose = false ist?
+        //funktioniert der zugriff so auch wenn transpose = false ist? -> Nein
         std::vector<double> new_point = {rpx, rpy};
-        // TODO: calculate initial min dist from (rpx, rpy) to target_data
-        double init_min_dist = minDist(new_point, target_data, target_data[0].size()); 
-        // std::cout << "dist: " << init_min_dist << std::endl; //debugg
-        // std::cout << "size: " << target_data[0].size() << std::endl; //debugg
 
+        double init_min_dist = minDist(new_point, target_data, target_data[0].size()); 
 
         // Get new point with smaller distance
         double new_min_dist = INFINITY;
@@ -89,15 +92,12 @@ int main(int argc, char const *argv[]){
             // shift point
             rpx_shift = rpx + rand_shift(generator);
             rpy_shift = rpy + rand_shift(generator);
-            // std::cout << "random shift x: " << rpx_shift << "  y: " << rpy_shift << std::endl;
-            // std::cout <<  std::endl;
             std::vector<double> mod_point = {rpx_shift, rpy_shift};
-            // TODO: calculate new min dist from (rpx_shift, rpy_shift) to target_data
+
             new_min_dist = minDist(mod_point, target_data, target_data[0].size());
             
             // simmulated annealing: break out of loop with a specific chance
             if(rand_break(generator)<temperature){
-                std::cout << "BREAK" << std::endl;
                 break;
             }
         }
@@ -118,28 +118,23 @@ int main(int argc, char const *argv[]){
         }
         if(check){
             counter++;
-            std::cout << "hits: " << counter << std::endl;
-        }
-            
+            //std::cout << "hits: " << counter << std::endl;
+        }           
 
         // Adjust temperature for simulated annealing
         if(init_temperature/(step+1) > min_temperature){ 
             temperature = init_temperature/(step+1);
-            // std::cout << "temp: " << temperature << std::endl;
         }
     }
     //time measurement of data transformation process
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
     std::cout << "elapsed time: " << duration.count()*1e-9 << "s" << std::endl;
-    std::cout << "working data: " << std::endl;
-    print_matrix(working_data);
-    std::cout << std::endl << "target data: " << std::endl;
-    print_matrix(target_data);
     if(save_data){
-        data_to_csv(working_data, "generated_data.csv");
-        data_to_csv(working_data, "target_data.csv");
-        generate_scatter_plot();
+        std::string fn = "output";
+        data_to_csv(working_data, fn+"_generated_data.csv");
+        data_to_csv(target_data, fn+"_target_data.csv");
+        generate_scatter_plot(fn);
     }
     return 0;
 }

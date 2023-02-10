@@ -341,15 +341,14 @@ std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>>
 }
 
 
-void data_to_csv(std::vector<std::vector<double>>* data, std::string filename)
+void data_to_csv(std::vector<std::vector<double>> data, std::string filename) //assuming data in format {{x1, x2, ...}, {y1, y2, ...}}
 {
     std::ofstream outfile;
     outfile.open(filename);
-
-    for(const auto point : *data){
-        outfile << point[0] << "," << point[1] << "\n";
-    } 
-
+    std::cout << "data[0].size() " << data[0].size() << " data[1].size() " << data[1].size() << std::endl;
+    for(int i = 0; i < data[0].size(); i++){
+        outfile << data[0][i] << "," << data[1][i] << "\n";
+    }
     outfile.close();
 }
 

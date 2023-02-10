@@ -18,7 +18,7 @@ std::vector<std::vector<double>> get_datasaurus_data();
 std::vector<std::vector<double>> generate_point_cloud(int num_samples);
 void print_matrix(std::vector<std::vector<double>> data); 
 std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>> data);
-void data_to_csv(std::vector<std::vector<double>>* data, std::string filename);
+void data_to_csv(std::vector<std::vector<double>> data, std::string filename);
 void generate_scatter_plot();
 void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* stats);
 double minDist(const std::vector<double> v1, const std::vector<std::vector <double>> shape, int shape_size);

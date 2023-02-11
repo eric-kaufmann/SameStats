@@ -316,3 +316,19 @@ std::vector<std::vector<double>> generate_point_cloud(int num_samples){
     }
     return data; //Zufällige gleichverteilte Daten x aus [0,100] und y aus [0,100] 
 }
+
+double easeInOutQuad(double n){ //inspired by pytweening library: https://github.com/asweigart/pytweening/blob/master/pytweening/__init__.py    
+    if(n>=0.0 && n <=1.0){
+        double result = 0.0;
+        if(n < 0.5){
+            result =  2*n*n;
+        }else{
+            n = n*2 - 1;
+            result = -0.5 * (n*(n-2) - 1);
+        }
+        return result;
+    }else{
+        std::cout << "error in easeInOutQuad: invalid input" << std::endl;
+        return 0.0;
+    }
+}

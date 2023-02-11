@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]){
     // All possible init shapes 
     // {"datasaurus", "random"};
     std::string init_shape = "random";
-    // std::string init_shape = "datasaurus";
+    init_shape = "datasaurus";
     std::vector<std::vector<double>> working_data;
     if (init_shape == "datasaurus"){
         working_data = get_datasaurus_data();

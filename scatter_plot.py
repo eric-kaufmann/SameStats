@@ -22,11 +22,11 @@ with open(args.filename+'_target_data.csv') as csvfile:
         target.append((float(row[0]), float(row[1])))
 
 # create the scatter plot using matplotlib
-x, y = zip(*best)
-plt.scatter(x, y, c='b')
-
 x, y = zip(*target)
 plt.scatter(x, y, c='r')
+
+x, y = zip(*best)
+plt.scatter(x, y, c='b')
 
 # save the plot to a file
 print('saving scatter plot...')

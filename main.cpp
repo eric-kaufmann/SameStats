@@ -6,7 +6,7 @@ int main(int argc, char const *argv[]){
 
     bool save_data = true; // generates csv files and plots data
 
-    int num_steps = 1e4; // number of iteration steps
+    int num_steps = 1e6; // number of iteration steps
     double error = 1e-2; // maximum statistical diffence
     double max_shift = 0.1; // std of rand-norm for data point shift (0.1 adopted from autodesk paper) 
     int num_samples = 100; // #datapoints if a random point cloud is generated
@@ -78,7 +78,7 @@ int main(int argc, char const *argv[]){
     // Main loop over num_steps steps
     for(int step=0; step<num_steps; ++step){
         if (step % 1000==0){
-            std::cout << "step: " << step << std::endl;
+            std::cout << "Progress  " << step*100/num_steps << "%" << "\r";
         }
         temperature = (max_temp - min_temp) * easeInOutQuad(((num_steps-step)/num_steps)) + min_temp;
         // get random point

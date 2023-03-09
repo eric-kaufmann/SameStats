@@ -20,8 +20,8 @@ int main(int argc, char const *argv[]){
     // double min_temperature = 0.0; // minimal temperature (always temperature > min_temperature)
    
     // All possible init shapes 
-    // {"datasaurus", "random"};
-    std::string init_shape = "random";
+    std::vector<std::string> shape_name = {"datasaurus", "random"};
+    std::string init_shape = shape_name[0];
     std::vector<std::vector<double>> working_data;
     if (init_shape == "datasaurus"){
         working_data = get_datasaurus_data();

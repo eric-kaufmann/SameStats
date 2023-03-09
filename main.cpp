@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]){
     // All possible target shapes -> target_shape[i]
     // 0:"x"   1: "h_lines"    2: "v_lines"    3: "wide_lines" 4: "high_lines" 5: "slant_up" 6: "slant_down" 7: "center" 8: "star" 9: "down_parab"     
     std::vector<std::string> target_shape = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[0], working_data.size());
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[8], working_data.size());
 
     std::cout << "size target data: " << target_data.size() << std::endl;
 

@@ -60,16 +60,17 @@ void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* sta
     y_mean = y_mean / num_points;
 
     for(int i=0; i<num_points; ++i){
-        x_std += pow((data->at(0))[i] - x_mean, 2);
-        y_std += pow((data->at(1))[i] - x_mean, 2);
+        x_std += std::pow((data->at(0))[i] - x_mean, 2);
+        y_std += std::pow((data->at(1))[i] - y_mean, 2);
     } 
-    x_std = sqrt(x_std / num_points);
-    y_std = sqrt(y_std / num_points);
+    x_std = std::sqrt(x_std / (num_points-1));
+    y_std = std::sqrt(y_std / (num_points-1));
 
 
     for(int i=0; i<num_points; ++i){
-        pearson += ((data->at(0))[i] - x_mean)*((data->at(1))[i] - y_mean) / (num_points * x_std * y_std);
+        pearson += ((data->at(0))[i] - x_mean)*((data->at(1))[i] - y_mean);
     } 
+    pearson = pearson / (num_points * x_std * y_std);
 
     stats->at(0) = x_mean;
     stats->at(1) = y_mean;

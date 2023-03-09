@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]){
     std::uniform_int_distribution<int> rand_point_dist(0,working_data[0].size()); // selects a random point idx
     std::normal_distribution<double> rand_shift(0.0,1.0); // generates shift for points (standard normal distribution -> adopted from autodesk paper)
     std::uniform_real_distribution<> rand_break(0.0, 1.0); // gives a chance to break out of loop (continous uniform dist in [0.0, 2.0) adopted from autodesk paper)
-
+    int test;
     // double temperature = init_temperature;
     double temperature;
     auto start = std::chrono::high_resolution_clock::now();

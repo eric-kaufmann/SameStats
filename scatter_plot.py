@@ -28,6 +28,7 @@ plt.scatter(x, y, c='r')
 x, y = zip(*best)
 plt.scatter(x, y, c='b')
 
+
 # save the plot to a file
 print('saving scatter plot...')
 plt.savefig(args.filename+'_scatter_plot.png')

@@ -321,7 +321,7 @@ std::vector<std::vector<double>> generate_point_cloud(int num_samples){
         };
         data.push_back(new_point);
     }
-    return data; //Zufällige gleichverteilte Daten x aus [0,100] und y aus [0,100] 
+    return data; //random uniformly distributed data x from [0,100] and y from [0,100] 
 }
 
 double easeInOutQuad(double n){ //inspired by pytweening library: https://github.com/asweigart/pytweening/blob/master/pytweening/__init__.py    

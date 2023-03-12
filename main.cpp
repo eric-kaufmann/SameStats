@@ -55,7 +55,7 @@ int main(int argc, char const *argv[]){
         generate_scatter_plot(fn);
     }
     int padding = 4;
-    int threads=16; 
+    int threads=2; 
 #pragma omp parallel num_threads(threads)
 {
         threads = omp_get_num_threads();
@@ -174,7 +174,7 @@ int main(int argc, char const *argv[]){
                 if(old_max < tol)
                     loop = false;
             }
-            if(step > 400000)
+            if(step > 200000)
                 loop = false;
             // // Adjust temperature for simulated annealing
             // if(init_temperature/(step+1) > min_temperature){ 
@@ -201,9 +201,12 @@ int main(int argc, char const *argv[]){
     for(auto &stats : end_stats){
         std::cout << stats << std::endl;
     }
+
     if(save_data){
         std::string fn = "output";
+        std::cout << "save working data.." << std::endl;
         data_to_csv(working_data, fn+"_generated_data.csv");
+        std::cout << "save target data.." << std::endl;
         data_to_csv(target_data, fn+"_target_data.csv");
         generate_scatter_plot(fn);
     }

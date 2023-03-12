@@ -155,7 +155,7 @@ double minDist(const std::vector<double> v1, const std::vector<std::vector<doubl
 
 bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
     for(int i = 0; i < stats1->size(); ++i){
-        if( (stats1->at(i) - stats2->at(i)) > error ){
+        if(fabs( (stats1->at(i) - stats2->at(i)) ) > error ){
             return false;
         }
     }
@@ -234,14 +234,14 @@ std::vector<std::vector<double>> refactorData(std::vector<std::vector<std::vecto
     }
 
     for(auto &element : new_working_data){
-        j++;
-        if(j==vec_size){
+        if(j==(vec_size-1)){
             toggle = gap;
         }
         for(int i = padding; i < element[0].size()-padding-toggle; i++){
             working_data[0][i-padding+j*(element[0].size()-2*padding)] = element[0][i]; //x value
             working_data[1][i-padding+j*(element[1].size()-2*padding)] = element[1][i-padding]; //y value
         }
+        j++;
     }
     return working_data;    
 }

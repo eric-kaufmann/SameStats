@@ -109,7 +109,7 @@ double minDist(const std::vector<double> v1, const std::vector<std::vector <doub
 
 bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
     for(int i = 0; i < stats1->size(); ++i){
-        if( (stats1->at(i) - stats2->at(i)) > error ){
+        if(fabs( (stats1->at(i) - stats2->at(i))) > error ){
             return false;
         }
     }

@@ -7,7 +7,7 @@ int main(int argc, char const *argv[]){
     bool save_data = true; // generates csv files and plots data
 
     int num_steps = 1e6; // number of iteration steps
-    double error = 1; // maximum statistical diffence (1e-2)
+    double error = sqrt(1e-1); // maximum statistical diffence (1e-2)
     double max_shift = 0.1; // std of rand-norm for data point shift (0.1 adopted from autodesk paper) 
     int num_samples = 100; // #datapoints if a random point cloud is generated
     double max_temp = 0.4; //param for sim annealing (0.4 adopted from paper)
@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]){
     // All possible target shapes -> target_shape[i]
     // 0:"x"   1: "h_lines"    2: "v_lines"    3: "wide_lines" 4: "high_lines" 5: "slant_up" 6: "slant_down" 7: "center" 8: "star" 9: "down_parab"     
     std::vector<std::string> target_shape = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[0], working_data.size());
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[2], working_data.size());
 
     std::cout << "size target data: " << target_data.size() << std::endl;
     int num_points;
@@ -46,6 +46,7 @@ int main(int argc, char const *argv[]){
         target_data = transpose_data(target_data);
         num_points = working_data[0].size(); //number of points in data set
     }
+    // print_matrix(working_data);
 
     // Save Input data
     if(save_data){
@@ -54,6 +55,8 @@ int main(int argc, char const *argv[]){
         data_to_csv(target_data, fn+"_target_data.csv");
         generate_scatter_plot(fn);
     }
+    std::vector<double> global_stats(5); //x_mean, y_mean, x_std, y_std, pearson
+    calc_stats(&working_data, &global_stats);
     int padding = 4;
     int threads=2; 
 #pragma omp parallel num_threads(threads)
@@ -64,19 +67,17 @@ int main(int argc, char const *argv[]){
 
     std::vector<std::vector<std::vector<double>>> new_working_data;
     new_working_data = partitionData(threads, padding, working_data);
-    printVector(new_working_data);
+    // printVector(new_working_data);
     auto start = std::chrono::high_resolution_clock::now();
     int check_portion = 0; //debug
-    int rest = working_data[0].size()%threads;
-    std::vector<double> global_stats(5); //x_mean, y_mean, x_std, y_std, pearson
-    calc_stats(&working_data, &global_stats);
+    
 
     // int j = 0;
-// #pragma omp parallel for num_threads(threads)
+#pragma omp parallel for num_threads(threads)
     for(auto &data_portion : new_working_data){
         // bool rest_check;
         int toggle = 0;
-        print_matrix(data_portion);
+        // print_matrix(data_portion);
         // Calculate initial stats
         std::vector<double> init_stats(5); 
         std::vector<double> working_stats(5);
@@ -104,7 +105,7 @@ int main(int argc, char const *argv[]){
         
         bool check = true;
         bool loop =  true;
-        double tol = 1.0;
+        double tol = 0.5;
         int counter = 0;
         double old_max = INFINITY;
         // Main loop over num_steps steps
@@ -112,8 +113,8 @@ int main(int argc, char const *argv[]){
 
         for(int step=0; loop; step++){
             // omp_get_thread_num() == 1 && 
-            if(step%1000 == 0)
-                std::cout << "iter: " << check_portion << " step: " << step <<"  maxnorm: " << old_max << " point (x,y): " << max_point[0] << " , " << max_point[1] << std::endl;
+            // if(step%1000 == 0)
+            //     std::cout << "iter: " << check_portion << " step: " << step <<"  maxnorm: " << old_max << " point (x,y): " << max_point[0] << " , " << max_point[1] << std::endl;
             temperature = (max_temp - min_temp) * easeInOutQuad(((num_steps-step)/num_steps)) + min_temp;
             // get random point
             int rand_point_idx = rand_point_dist(generator);
@@ -150,7 +151,7 @@ int main(int argc, char const *argv[]){
             calc_partitionedStats(data_portion, &working_stats, num_points, global_stats[0], global_stats[1], global_stats[2], global_stats[3]); // set initial stats
             check = true;
             // check if statistics are ca. the same to our inital stats
-            if(!check_stats(&working_stats, &init_stats, error)){ //kann sein dass error verändert werden muss --> vergleichen größere werte
+            if(!check_Partitionedstats(&working_stats, &init_stats, error)){ //kann sein dass error verändert werden muss --> vergleichen größere werte
                 // not the same -> return points to old value
                 check = false;
                 data_portion[0][rand_point_idx] = rpx;
@@ -158,7 +159,6 @@ int main(int argc, char const *argv[]){
             }
             if(check){
                 counter++;
-                //std::cout << "hits: " << counter << std::endl;
             }     
             if (step % 100 ==0){
                 double max = 0.0;
@@ -174,7 +174,7 @@ int main(int argc, char const *argv[]){
                 if(old_max < tol)
                     loop = false;
             }
-            if(step > 200000)
+            if(step > num_steps)
                 loop = false;
             // // Adjust temperature for simulated annealing
             // if(init_temperature/(step+1) > min_temperature){ 
@@ -182,9 +182,13 @@ int main(int argc, char const *argv[]){
             // }
         }
         check_portion++;
-    }
+        std::cout << "hits: " << counter << std::endl;
 
-    working_data = refactorData(new_working_data, working_data, threads, padding);
+    }
+    // std::vector<std::vector<double>> result_data;
+    // result_data = refactorData(new_working_data, working_data, threads, padding); //merge data from each thread to one data set
+    
+    working_data = refactorData(new_working_data, working_data, threads, padding); //merge data from each thread to one data set
     //time measurement of data transformation process
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -192,7 +196,7 @@ int main(int argc, char const *argv[]){
 
     std::vector<double> end_stats(5);
     calc_stats(&working_data, &end_stats);
-
+    
     std::cout << "initial stats: " << std::endl;
     for(auto &stats : global_stats){
         std::cout << stats << std::endl;
@@ -201,6 +205,8 @@ int main(int argc, char const *argv[]){
     for(auto &stats : end_stats){
         std::cout << stats << std::endl;
     }
+    // print_matrix(result_data);
+    // compareData(working_data, result_data);
 
     if(save_data){
         std::string fn = "output";

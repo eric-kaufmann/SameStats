@@ -2,9 +2,12 @@
 
 void print_matrix(std::vector<std::vector<double>> data){ // gesammelte x,y koordinaten falls transpose = false
     for (int i = 0; i < data.size(); i++) {
-        for (int j = 0; j < data[i].size(); j++)
-            std::cout << data[i][j] << " ";
-        std::cout << std::endl;
+        for (int j = 0; j < data[i].size(); j++){
+            std::cout << "[" << j << "] " << data[i][j] << " ";
+            if(j % 11 == 0)
+                std::cout << std::endl;
+        }
+        std::cout << std::endl << std::endl;
     }
 }
 
@@ -120,7 +123,7 @@ void calc_partitionedStats(std::vector<std::vector<double>> data, std::vector<do
         if(data[0][i] != 0.0 && data[1][i] != 0.0) //filter zeros
             pearson += (data[0][i] - global_Xmean)*(data[1][i] - global_Ymean);
     }
-    pearson = pow(pearson / (num_points * global_Xstd * global_Ystd),2); //? wichtig für relativen vergleich? --> nur summe btrachten reicht?
+    pearson = pearson / (num_points * global_Xstd * global_Ystd); //? wichtig für relativen vergleich? --> nur summe btrachten reicht?
 
     stats->at(0) = x_mean;
     stats->at(1) = y_mean;
@@ -162,6 +165,18 @@ bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, doubl
     return true;
 }
 
+bool check_Partitionedstats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
+    for(int i = 0; i < stats1->size()-1; ++i){
+        if(sqrt(fabs( stats1->at(i) - stats2->at(i)) ) > error ){
+            return false;
+        }
+    }
+    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,3)){
+        return false;
+    }
+    return true;
+}
+
 //partition data thread-wise, insert padding into data to prevent false sharing
 std::vector<std::vector<std::vector<double>>> partitionData(int num_threads, int padding, std::vector<std::vector<double>> pointCloud){ //pointCloud is assumed to be transposed
     int size_x = pointCloud[0].size();
@@ -191,28 +206,33 @@ std::vector<std::vector<std::vector<double>>> partitionData(int num_threads, int
     return paddingData;
 }
 
-void printVector(std::vector<std::vector<std::vector<double>>> working_data){
+void printVector(std::vector<std::vector<std::vector<double>>> working_data){ //debugging
     int j = 1;
     int count = 0;
     std::vector<std::string> names = {"x: ", "y: "};
     for(auto &vec : working_data){
-        std::cout << j << ". Vector: " << std::endl;
+        std::cout <<std::endl<< j << ". Vector: " << std::endl;
         int i = 0;
         for(auto &xyVec : vec){
+            int z = 0;
             for( auto &vals : xyVec){
                 if(vals != 0){
                     count++;
                 }
-                std::cout << names[i] << vals << std::endl;
+                std::cout <<"["<<j<<"]"<<"["<<i<<"]"<<"["<<z<<"] "<< vals << " ";
+                if(z%9==0)
+                    std::cout<<std::endl;
+                z++;
             }
-            i++; 
+            i++;
+            std::cout<<std::endl; 
         }
         j++; 
     }
-    std::cout << "num points: " << count/2 << std::endl;
+    // std::cout << "num points: " << count/2 << std::endl;
 }
 
-int count_nonzeros(std::vector<std::vector<double>> working_data, int padding){
+int count_nonzeros(std::vector<std::vector<double>> working_data, int padding){ //debugging
     int counts = 0;
     for(auto &element : working_data[0]){
         if(element != 0){
@@ -234,14 +254,32 @@ std::vector<std::vector<double>> refactorData(std::vector<std::vector<std::vecto
     }
 
     for(auto &element : new_working_data){
-        if(j==(vec_size-1)){
+        if(j==(num_threads-1)){
             toggle = gap;
         }
-        for(int i = padding; i < element[0].size()-padding-toggle; i++){
-            working_data[0][i-padding+j*(element[0].size()-2*padding)] = element[0][i]; //x value
-            working_data[1][i-padding+j*(element[1].size()-2*padding)] = element[1][i-padding]; //y value
+        for(int i = padding; i < element[0].size()-toggle; i++){
+            working_data[0][i-padding+j*vec_size] = element[0][i]; //x value
+            working_data[1][i-padding+j*vec_size] = element[1][i-padding]; //y value
         }
         j++;
     }
     return working_data;    
+}
+
+void compareData(std::vector<std::vector<double>> vec1, std::vector<std::vector<double>>vec2){ //debuggen
+    std::vector<int> result;
+    if(vec1[0].size() != vec2[0].size() || vec1[1].size() != vec2[1].size())
+        std::cout << "output and input are incompatible!" << std::endl;
+    for(int i = 0; i < vec1.size(); i++){
+        for(int j = 0; j < vec1[0].size(); j++){
+            if(vec1[i][j] != vec2[i][j]){
+                result.push_back(j);
+            }
+        }
+        result.push_back(1111111);
+    }
+    std::cout << "indices with different values:" << std::endl;
+    for(auto &element : result){
+        std::cout << element << std::endl;
+    }
 }

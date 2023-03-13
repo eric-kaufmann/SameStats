@@ -6,12 +6,12 @@ int main(int argc, char const *argv[]){
 
     bool save_data = true; // generates csv files and plots data
     int padding = 4;
-    int threads=4; 
+    int threads=8; 
     int seriell_steps = 1e6;
     int num_steps = seriell_steps/threads; // number of iteration steps
-    double error = sqrt(1e-1); // maximum statistical diffence (1e-2)
+    double error = sqrt(1e-2); // maximum statistical diffence (1e-2)       (1e-1)
     double max_shift = 0.1; // std of rand-norm for data point shift (0.1 adopted from autodesk paper) 
-    int num_samples = 100; // #datapoints if a random point cloud is generated
+    int num_samples = 1000; // #datapoints if a random point cloud is generated
     double max_temp = 0.4; //param for sim annealing (0.4 adopted from paper)
     double min_temp = 0.01; // param for sim annealing (0.0 or 0.01 in paper)
     // set data format by transposing data
@@ -23,7 +23,7 @@ int main(int argc, char const *argv[]){
    
     // All possible init shapes 
     std::vector<std::string> shape_name = {"datasaurus", "random"};
-    std::string init_shape = shape_name[0];
+    std::string init_shape = shape_name[1];
     std::vector<std::vector<double>> working_data;
     if (init_shape == "datasaurus"){
         working_data = get_datasaurus_data();
@@ -37,7 +37,7 @@ int main(int argc, char const *argv[]){
     // All possible target shapes -> target_shape[i]
     // 0:"x"   1: "h_lines"    2: "v_lines"    3: "wide_lines" 4: "high_lines" 5: "slant_up" 6: "slant_down" 7: "center" 8: "star" 9: "down_parab"     
     std::vector<std::string> target_shape = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[8], working_data.size());
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[5], working_data.size());
 
     std::cout << "size target data: " << target_data.size() << std::endl;
     int num_points;
@@ -59,12 +59,13 @@ int main(int argc, char const *argv[]){
     }
     std::vector<double> global_stats(5); //x_mean, y_mean, x_std, y_std, pearson
     calc_stats(&working_data, &global_stats);
+    int max_threads;
     
-#pragma omp parallel num_threads(threads)
+#pragma omp parallel
 {
-        threads = omp_get_num_threads();
+        max_threads = omp_get_max_threads();
 }
-    std::cout << "num threads: " << threads << std::endl;
+    std::cout << "max threads: " << max_threads << " involved threads: " << threads << std::endl;
 
     std::vector<std::vector<std::vector<double>>> new_working_data;
     new_working_data = partitionData(threads, padding, working_data);
@@ -74,9 +75,10 @@ int main(int argc, char const *argv[]){
     
 
     // int j = 0;
-// #pragma omp parallel for num_threads(threads)
+#pragma omp parallel for num_threads(threads)
     for(auto &data_portion : new_working_data){
         // bool rest_check;
+
         int toggle = 0;
         // print_matrix(data_portion);
         // Calculate initial stats
@@ -113,6 +115,8 @@ int main(int argc, char const *argv[]){
         std::vector<double> max_point = {0.0,0.0};      
 
         for(int step=0; loop; step++){
+            // if(step%1000==0)
+                // std::cout << step << "\r";
             // omp_get_thread_num() == 1 && 
             // if(step%1000 == 0)
             //     std::cout << "iter: " << check_portion << " step: " << step <<"  maxnorm: " << old_max << " point (x,y): " << max_point[0] << " , " << max_point[1] << std::endl;
@@ -174,8 +178,10 @@ int main(int argc, char const *argv[]){
                 }
                 if(max < old_max)
                     old_max = max;
-                if(old_max < tol)
+                if(old_max < tol){
                     loop = false;
+                    std::cout << "OLDMAX hittet" << std::endl;
+                }
             }
             if(step > num_steps)
                 loop = false;

@@ -171,7 +171,7 @@ bool check_Partitionedstats(std::vector<double>* stats1, std::vector<double>* st
             return false;
         }
     }
-    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,3)){
+    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,6)){
         return false;
     }
     return true;

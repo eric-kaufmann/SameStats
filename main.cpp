@@ -6,7 +6,7 @@ int main(int argc, char const *argv[]){
 
     bool save_data = true; // generates csv files and plots data
     int padding = 4;
-    int threads=1; 
+    int threads=4; 
     int seriell_steps = 1e6;
     int num_steps = seriell_steps/threads; // number of iteration steps
     double error = sqrt(1e-1); // maximum statistical diffence (1e-2)

@@ -5,8 +5,10 @@
 int main(int argc, char const *argv[]){
 
     bool save_data = true; // generates csv files and plots data
-
-    int num_steps = 1e6; // number of iteration steps
+    int padding = 4;
+    int threads=1; 
+    int seriell_steps = 1e6;
+    int num_steps = seriell_steps/threads; // number of iteration steps
     double error = sqrt(1e-1); // maximum statistical diffence (1e-2)
     double max_shift = 0.1; // std of rand-norm for data point shift (0.1 adopted from autodesk paper) 
     int num_samples = 100; // #datapoints if a random point cloud is generated
@@ -35,7 +37,7 @@ int main(int argc, char const *argv[]){
     // All possible target shapes -> target_shape[i]
     // 0:"x"   1: "h_lines"    2: "v_lines"    3: "wide_lines" 4: "high_lines" 5: "slant_up" 6: "slant_down" 7: "center" 8: "star" 9: "down_parab"     
     std::vector<std::string> target_shape = {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
-    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[2], working_data.size());
+    std::vector<std::vector<double>> target_data = get_points_for_shape(target_shape[8], working_data.size());
 
     std::cout << "size target data: " << target_data.size() << std::endl;
     int num_points;
@@ -57,8 +59,7 @@ int main(int argc, char const *argv[]){
     }
     std::vector<double> global_stats(5); //x_mean, y_mean, x_std, y_std, pearson
     calc_stats(&working_data, &global_stats);
-    int padding = 4;
-    int threads=2; 
+    
 #pragma omp parallel num_threads(threads)
 {
         threads = omp_get_num_threads();
@@ -73,7 +74,7 @@ int main(int argc, char const *argv[]){
     
 
     // int j = 0;
-#pragma omp parallel for num_threads(threads)
+// #pragma omp parallel for num_threads(threads)
     for(auto &data_portion : new_working_data){
         // bool rest_check;
         int toggle = 0;
@@ -133,14 +134,16 @@ int main(int argc, char const *argv[]){
                 // shift point
                 rpx_shift = rpx + max_shift*rand_shift(generator); //scaled standard normal distribution --> std = max_shift, mu = 0
                 rpy_shift = rpy + max_shift*rand_shift(generator);
-                std::vector<double> mod_point = {rpx_shift, rpy_shift};
 
-                new_min_dist = minDist(mod_point, target_data, target_data[0].size());
-                
                 // simmulated annealing: break out of loop with a specific chance
                 if(rand_break(generator)<temperature){
                     break;
                 }
+
+                std::vector<double> mod_point = {rpx_shift, rpy_shift};
+                new_min_dist = minDist(mod_point, target_data, target_data[0].size());
+                
+                
             }
 
             // embed new point into vector

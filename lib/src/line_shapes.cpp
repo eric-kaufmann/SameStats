@@ -147,7 +147,7 @@ std::vector<std::vector<double>> get_points_for_shape(std::string shape, int num
     std::vector<std::vector<double>> target_data = get_points_by_lines(lines, num_samples);
 
     int iter = 0;
-    while(target_data.size() < num_samples){
+    while((int)target_data.size() < num_samples){
         target_data.push_back(target_data[iter]);
         ++iter;
     }

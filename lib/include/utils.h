@@ -25,6 +25,8 @@ std::vector<std::vector<double>> refactorData(std::vector<std::vector<std::vecto
 void printVector(std::vector<std::vector<std::vector<double>>> working_data);
 int count_nonzeros(std::vector<std::vector<double>> working_data, int padding);
 void compareData(std::vector<std::vector<double>> vec1, std::vector<std::vector<double>>vec2);
+double get_MaxError(std::vector<double> init_stats, std::vector<double> final_stats);
+
 
 
 

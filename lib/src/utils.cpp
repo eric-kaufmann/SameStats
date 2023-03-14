@@ -1,8 +1,8 @@
 #include "utils.h"
 
 void print_matrix(std::vector<std::vector<double>> data){ // gesammelte x,y koordinaten falls transpose = false
-    for (int i = 0; i < data.size(); i++) {
-        for (int j = 0; j < data[i].size(); j++){
+    for (int i = 0; i < (int)data.size(); i++) {
+        for (int j = 0; j < (int)data[i].size(); j++){
             std::cout << "[" << j << "] " << data[i][j] << " ";
             if(j % 11 == 0)
                 std::cout << std::endl;
@@ -32,7 +32,7 @@ void data_to_csv(std::vector<std::vector<double>> data, std::string filename) //
     std::ofstream outfile;
     outfile.open(filename, std::ios::trunc);
     //std::cout << "data[0].size() " << data[0].size() << " data[1].size() " << data[1].size() << std::endl;
-    for(int i = 0; i < data[0].size(); i++){
+    for(int i = 0; i < (int)data[0].size(); i++){
         outfile << data[0][i] << "," << data[1][i] << "\n";
         //std::cout << "write " << data[0][i] << "   " << data[1][i] << std::endl;
     }
@@ -80,11 +80,6 @@ void calc_stats(std::vector<std::vector<double>>* data, std::vector<double>* sta
     stats->at(3) = y_std;
     stats->at(4) = pearson;
 
-//     std::cout << "x_mean: " << stats->at(0) << std::endl;
-//     std::cout << "y_mean: " << stats->at(1) << std::endl;
-//     std::cout << "x_std: " << stats->at(2) << std::endl;
-//     std::cout << "y_std: " << stats->at(3) << std::endl;
-//     std::cout << "pearson: " << stats->at(4) << std::endl;
 }
 
 void calc_partitionedStats(std::vector<std::vector<double>> data, std::vector<double>* stats, int num_points, double global_Xmean, double global_Ymean, double global_Xstd, double global_Ystd){ //num_points: globale anzahl datenpunkte
@@ -140,15 +135,15 @@ double minDist(const std::vector<double> v1, const std::vector<std::vector<doubl
     double result=INFINITY;
     double x_diff, y_diff;
     double buff[shape_size];
-// #pragma omp parallel for shared(buff)
+
     for(int i = 0; i < shape_size; i++){
         x_diff = std::pow((v1[0] - shape[0][i]),2); //quadratic difference
         y_diff = std::pow((v1[1] - shape[1][i]),2); //quadratic difference
         buff[i] = std::sqrt(x_diff+y_diff); //norm
     }
-// #pragma omp parallel for reduction(min:result)
+
     for(int i = 0; i < shape_size; i++){
-        // result = std::min(result, buff[i]);
+
         if(buff[i]<result)
             result = buff[i];   
     }
@@ -157,7 +152,7 @@ double minDist(const std::vector<double> v1, const std::vector<std::vector<doubl
 
 
 bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
-    for(int i = 0; i < stats1->size(); ++i){
+    for(int i = 0; i < (int)stats1->size(); ++i){
         if(fabs( (stats1->at(i) - stats2->at(i)) ) > error ){
             return false;
         }
@@ -166,12 +161,12 @@ bool check_stats(std::vector<double>* stats1, std::vector<double>* stats2, doubl
 }
 
 bool check_Partitionedstats(std::vector<double>* stats1, std::vector<double>* stats2, double error){
-    for(int i = 0; i < stats1->size()-1; ++i){
+    for(int i = 0; i < (int)stats1->size()-1; ++i){
         if(sqrt(fabs( stats1->at(i) - stats2->at(i)) ) > error ){
             return false;
         }
     }
-    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,6)){
+    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,2)){
         return false;
     }
     return true;
@@ -186,7 +181,6 @@ std::vector<std::vector<std::vector<double>>> partitionData(int num_threads, int
     }
     int num_points = size_x/num_threads;
     if(size_x%num_threads != 0){
-        int rest = size_x%num_threads; //rest
         num_points++; //wenn es einen rest gibt, soll jeder vektor um 1 vergrößert werden -> genug platz für alle punkte
     }
     std::vector<std::vector<std::vector<double>>> paddingData(num_threads, std::vector<std::vector<double>>(2, std::vector<double>(num_points + padding, 0))); //3d: each thread gets a 2d vector, initialized with zeros 
@@ -257,7 +251,7 @@ std::vector<std::vector<double>> refactorData(std::vector<std::vector<std::vecto
         if(j==(num_threads-1)){
             toggle = gap;
         }
-        for(int i = padding; i < element[0].size()-toggle; i++){
+        for(int i = padding; i < (int)element[0].size()-toggle; i++){
             working_data[0][i-padding+j*vec_size] = element[0][i]; //x value
             working_data[1][i-padding+j*vec_size] = element[1][i-padding]; //y value
         }
@@ -270,8 +264,8 @@ void compareData(std::vector<std::vector<double>> vec1, std::vector<std::vector<
     std::vector<int> result;
     if(vec1[0].size() != vec2[0].size() || vec1[1].size() != vec2[1].size())
         std::cout << "output and input are incompatible!" << std::endl;
-    for(int i = 0; i < vec1.size(); i++){
-        for(int j = 0; j < vec1[0].size(); j++){
+    for(int i = 0; i < (int)vec1.size(); i++){
+        for(int j = 0; j < (int)vec1[0].size(); j++){
             if(vec1[i][j] != vec2[i][j]){
                 result.push_back(j);
             }
@@ -282,4 +276,15 @@ void compareData(std::vector<std::vector<double>> vec1, std::vector<std::vector<
     for(auto &element : result){
         std::cout << element << std::endl;
     }
+}
+
+double get_MaxError(std::vector<double> init_stats, std::vector<double> final_stats){
+    double max = 0.0;
+    double diff;
+    for(int i = 0; i < (int)init_stats.size(); i++){
+        diff = fabs(init_stats[i]-final_stats[i]);
+        if(diff > max)
+            max = diff;
+    }
+    return max;
 }

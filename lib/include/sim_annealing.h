@@ -3,6 +3,6 @@
 
 #include <string>
 
-double sim_annealing(std::string shape);
+double sim_annealing(std::string shape, int threads, int serial_steps);
 
 #endif

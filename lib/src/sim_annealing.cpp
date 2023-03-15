@@ -1,11 +1,11 @@
 #include "utils.h"
 #include "line_shapes.h"
 
-double sim_annealing(std::string shape){  // all possible shapes: {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
+double sim_annealing(std::string shape, int threads, int serial_steps){  // all possible shapes: {"x", "h_lines", "v_lines", "wide_lines", "high_lines", "slant_up", "slant_down", "center", "star", "down_parab"};
 
 
     int max_threads;
-    int threads=8; //seems to be the best trade off between speed and accuracy. --> more threads hinder shift to a specific shape due to lower degree of freedom for each point in a smaller group. 
+    // int threads=8; //seems to be the best trade off between speed and accuracy. --> more threads hinder shift to a specific shape due to lower degree of freedom for each point in a smaller group. 
 #pragma omp parallel
 {
     max_threads = omp_get_max_threads();
@@ -16,7 +16,7 @@ double sim_annealing(std::string shape){  // all possible shapes: {"x", "h_lines
     bool save_data = true; // generates csv files and plots data
     int padding = 4;
 
-    int serial_steps = 1e6;
+    // int serial_steps = 1e6;
     int num_steps = serial_steps/threads; // number of iteration steps --> to shift one point the same times in parallelized version, we can divide serial_steps by number of threads.
     double error = sqrt(1e-2); // maximum statistical diffence (1e-2)     we take sqrt() because statistics in local groups is squared
     double max_shift = 0.1; // std of rand-norm for data point shift (0.1 adopted from autodesk paper) 

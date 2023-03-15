@@ -191,7 +191,12 @@ TODO: Simmulated Annealing allowBrak() Umsetzung
 
 \subsection{Optimizations}\label{sec:algo:opti}
 
-TODO: Wie wurde die Parallelisierung durchgeführt
+Der originale Programmiercode von Matejka und Fitzmaurice ist in der Programmiersprache Python verfasst und sollte keine Lösung in minimaler Laufzeit erreichen. In dieser Veröffentlichung wurde nun jedoch versucht diesen Algorithmus zu optimieren. Durch die Verwendung von C++ als Programmiersprache wird ein effizientes Speichermanagement, gute und einfache Möglichkeiten der Parallelisierung sowie Compileroptimierungen gewährleistet. Allein duch diese Änderungen wird ein großer Performance-Gewinn erhofft. 
+Um einen zusätzliche Optimierung zu erreichen wurde die Berechnung der minimalen Distanz von einem Punkt zum Targetdatensatz abgeändert. In der Originalversion wird der Targetdatensatz durch Linien definiert. Der kürzeste Abstand wird somit durch die Berechnung der Distanz von Punkt zu Linie durchgeführt. In der optimierten Version werden die Linien durch Punkte diskretisiert. Somit wird die Distanz von Punkt zu Punkt bestimmt, welches effizienter zu berechnen ist. Zusätzlich wird ermöglicht, dass durch eine größere Diskretisierung, d.h. weniger Punkte pro Linie, die Laufzeit zur Berechnung der minimalen Distanz weiter reduziert werden kann. Dabei muss jedoch beachtet werden, dass zu wenige Punkte zu einem schlechteren Ergebnis führen. Somit muss ein sinnvoller Trade-of erreicht werden.
+
+Als näschtes wurde mittels OpenMP versucht den seriellen C++-Programmiercode zu parallelisieren. Als Grundlage dafür wurde ein Divide-and-Conquer-Ansatz gewählt. Der Initiale Datensatz wird demnach gleichmäßig in so viele Teile Aufgeteilt, wie es Threads gibt. Anschließend wird der Iterationsschritt auf allen Teilen des Datensatzes parallel über alle Threads ausgeführt. Das bedeutet es werden somit gleichzeitig \textit{num\_threads} (Anzahl der Threads) Punkte zufällig ausgewählt, geshiftet, und die Statistiken berechnet. Somit könnte die Laufzeit idealisiert auf $\frac{1}{num\_threads}$ reduziert werden.
+Jedoch entstehen Probleme. Durch die Aufteilung des Datensatzes in Teildatensätze ist es schwierig 
+
 
 
 \section{Experiments}\label{sec:exp}
@@ -206,21 +211,14 @@ Verglichen werden dabei folgende Fälle:
   \item der gleiche Algorithmus in C++, jedoch nun parallelisiert mit den Optimierungen aus Abschnitt \ref{sec:algo:opti} ausgeführt.
 \end{itemize}
 
-Die Experimente wurden dabei auf 
-TODO: Spezifikationen (Prozessor)
-ausgeführt. Somit kann eine Vergleichbarkeit erreicht werden.
+Die Experimente wurden dabei auf einem AMD Ryzen 7 6800 HS mit 8 Kernen und 16 Threads ausgeführt. Somit kann eine Vergleichbarkeit erreicht werden.
 
 \paragraph{Experiment 1}
 
 Im ersten Experiment wurden alle drei Fälle über unterschiedlich vielen Iterationen ausgeführt. Dabei wurden 100'000, 200'000, 500'000 und 1'000'000 Iterationen als Ausgangslage verwendet. Die Zeiten wurden in Sekunden gemessen. Durch die große Anzahl der Iterationen wird gewährleistet, dass alle Algorithmen zu einer guten Lösung kommen. 
 Bei dem Fall \textit{C++/parallel} wurde die beste parallele Zeit verwendet, die erreicht werden konnte, ohne dass größere Verminderungen des Ergebnisses zur Folge gekommen sind. In diesem Fall wurden TODO: Anzahl Threads verwendet.
- Die Ergenisse für dieses Experimente sind in Tabelle \ref{tab:serpar} zu erkennen. 
-
- TODO: Auswertung serieell para Tabelle
-
- Allgemein lässt sich erkennen, dass allein die Verwendung einer Programmiersprache, wie C++ die Laufzeit enorm verkürzt. Durch Compileroptimierungen, sowie der generellen effizienten Speicheroptimierung ist sie bei berechnungsintensiven Anwendungen klar im Vorteil. Durch die zusätzliche Verwendung von OpenMP und die Aufteilung des Problems in Subprobleme kann eine weitere Beschleunigung erreicht werden, welche jedoch erst bei vielen Iterationen und großen Datensätzen eine sinnvolle Anwendung findet.
-
-
+ Die Ergenisse für dieses Experimente sind in Tabelle \ref{tab:serpar} zu erkennen.
+ 
 \begin{table}[htbp]
   \caption{Vergleich der Algorithmen und Ausführungsart über 100'000, 200'000, 500'000 und 1'000'000 Iterationen. Alle Angaben in Sekunden.}
   \label{tab:serpar}
@@ -229,40 +227,44 @@ Bei dem Fall \textit{C++/parallel} wurde die beste parallele Zeit verwendet, die
     \toprule
     Iterations & Python/serial & C++/serial & C++/parallel\\
     \midrule
-    100,000 &0& 0 & 0\\
-    200,000 &0& 0 & 0\\
-    500,000 &0& 0 & 0\\
-    1,000,000 &0& 0& 0\\
+    100,000 &132.00& 1.56 & 0.34\\
+    200,000 &208.00& 3.71 & 0.76\\
+    500,000 &520.00& 12.79 & 2.69\\
+    1,000,000 &1040.00& 32.03& 5.05\\
   \bottomrule
 \end{tabular}
 }
 \end{table}
 
- \paragraph{Experiment 2}
+Allgemein lässt sich erkennen, dass allein die Verwendung einer Programmiersprache, wie C++ die Laufzeit enorm verkürzt. Durch Compileroptimierungen, sowie der generellen effizienten Speicheroptimierung ist sie bei berechnungsintensiven Anwendungen klar im Vorteil. Somit brauchte unser serielle Algorithmus nur ca. 1\% der Zeit, die der serielle Python Algorithmus benötigt hatte. 
+Durch die zusätzliche Verwendung von OpenMP und die Aufteilung des Problems in Subprobleme konnte eine weitere Beschleunigung erreicht werden, sodass unser paralleler C++ Code ca. 4 bis 5 Mal schneller als der serielle Code ist. Bei 1'000'000 Iterationen ist er sogar 6 Mal so schnell. Im Vergleich zu dem seriellen Python Code konnten wir bei 1'000'000 Iterationen eine über 200-fache Beschleunigung erreichen. Bei 100'000 Iterationen sogar fast 390-fach.
 
- Im zweiten Experiemnt wurde nun der parallele C++ Algorithmus aufgegriffen und mit unterschiedlich vielen Threads ausgeführt. Auch hier wurden erneut 100'000, 200'000, 500'000 und 1'000'000 Iterationen als Ausgangslage verwendet. Mithilfe der zusätzlichen Benutzung der Threads soll betrachtet werden, in wie weit ein Speedup erreicht werden kann. Erwartet wird, dass der inhärent serielle Anteil, also der Bestandteil des Algorithmus, welcher schlecht bzw. gar nicht parallelisierbar ist, niedrig ist. Somit sollte die Verwendun mehrerer Thread zu einem größeren Performance-Gewinn führen. 
- Die Ergenbisse des zweiten Experiments sind in Tabelle \ref{tab:par} aufgelistet. 
+Die Ergebnisse zeigen deutlich auf, wie stark der Einfluss auf die Laufzeit allein bei der Verwendung einer anderen Programmiersprache ist. Mit zusätzlicher Parallelisierung kann man die Laufzeit von über 17 Minuten auf 5 Sekunden reduzieren.
 
- TODO: Auswertung para Tabelle
+\paragraph{Experiment 2}
 
- Die Anzahl der Threads hat somit einen Einfluss auf die Laufzeit des Algorithmus. Jedoch muss beachtet werden, dass dies nur sinnvoll ist, wenn die Datensätze groß sind. Durch die verringerte Anzahl der Freiheitsgrade bei der Berechung der statistischen Eigenschaften sind die Ergebnisse bei kleinen Datensätzen häufig nicht zufriedenstellend oder benötigen noch einige zusätzliche Iterationen, welche seriell nicht benötigt werden.
+Im zweiten Experiemnt wurde nun der parallele C++ Algorithmus aufgegriffen und mit unterschiedlich vielen Threads ausgeführt. Auch hier wurden erneut 100'000, 200'000, 500'000 und 1'000'000 Iterationen als Ausgangslage verwendet. Mithilfe der zusätzlichen Benutzung der Threads soll betrachtet werden, in wie weit ein Speedup erreicht werden kann. Erwartet wird, dass der inhärent serielle Anteil, also der Bestandteil des Algorithmus, welcher schlecht bzw. gar nicht parallelisierbar ist, niedrig ist. Somit sollte die Verwendung mehrerer Thread zu einem größeren Performance-Gewinn führen. 
+Die Ergebnisse des zweiten Experiments sind in Tabelle \ref{tab:par} aufgelistet. 
+
 
 \begin{table}[htbp]
   \caption{Vergleich der des parallelen C++ Algorithmus mit unterschiedlich vielen Threads über 100'000, 200'000, 500'000 und 1'000'000 Iterationen. Alle Angaben in Sekunden.}
   \label{tab:par}
 \resizebox{\columnwidth}{!}{
-  \begin{tabular}{l|ccc}
-    \toprule
-    Iterations & 2 Threads & 4 Threads & 8 Threads\\
-    \midrule
-    100,000 &0& 0 & 0\\
-    200,000 &0& 0 & 0\\
-    500,000 &0& 0 & 0\\
-    1,000,000 &0& 0& 0\\
-  \bottomrule
-\end{tabular}
+    \begin{tabular}{l|ccc}
+      \toprule
+      Iterations & 2 Threads & 4 Threads & 8 Threads\\
+      \midrule
+      100,000 &0.84& 0.44 & 0.34\\
+      200,000 &2.07& 1.19 & 0.76\\
+      500,000 &7.09& 3.87 & 2.69\\
+      1,000,000 &18.34& 10.54& 5.05\\
+    \bottomrule
+  \end{tabular}
 }
 \end{table}
+
+Dabei lässt sich gut erkennen, dass das Problem mit mehr Threads, die parallel ausgeführt werden, schneller die Iterationen abarbeiten kann. Die Anzahl der Threads hat somit einen Einfluss auf die Laufzeit des Algorithmus. Dabei ist der Geschwindigkeitszuwachs anscheinend kaum von der Anzahl der Iterationen abhängig. Das bedeutet, dass über alle Iterationen ein Geschwindigkeitszuwachs von 1.5 bis 2 bei Verdoppelung der Threads angenommen werden kann. Dabei muss beachtet werden, dass Lösung des Problems bei vielen Threads and Genauigkeit verliert. Das liegt an den fehlenden Freiheitsgraden. Somit werden, um ähnlich gute Ergebnisse zu erreichen, mehr Iterationen benötigt, je mehr Threads verwendet werden. Demnach muss ein Trade-off auf Anzahl der Threads und Iterationen gefunden werden.
 
 Somit bestätigen die Experimente die Ziele eine effizientere Generierung eines Datensatzes mit ähnlichen statistischen Eigenschaften zu ermöglichen.   
 

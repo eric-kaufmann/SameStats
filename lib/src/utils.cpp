@@ -1,15 +1,5 @@
 #include "utils.h"
 
-void print_matrix(std::vector<std::vector<double>> data){ // gesammelte x,y koordinaten falls transpose = false
-    for (int i = 0; i < (int)data.size(); i++) {
-        for (int j = 0; j < (int)data[i].size(); j++){
-            std::cout << "[" << j << "] " << data[i][j] << " ";
-            if(j % 11 == 0)
-                std::cout << std::endl;
-        }
-        std::cout << std::endl << std::endl;
-    }
-}
 
 std::vector<std::vector<double>> transpose_data(std::vector<std::vector<double>> data){
     std::vector<double> x_vals;
@@ -92,24 +82,24 @@ void calc_partitionedStats(std::vector<std::vector<double>> data, std::vector<do
     for(auto &it : data[0]){ //x values
         x_mean += it;
     }
-    x_mean = pow(x_mean/num_points,2);
+    x_mean = pow(x_mean/num_points,2); //pow because we compare with sqrt(error)
 
     for(auto &it : data[1]){ //y values
         y_mean += it;
     }
-    y_mean = pow(y_mean/num_points,2);
+    y_mean = pow(y_mean/num_points,2); //pow because we compare with sqrt(error)
 
     for(auto &it : data[0]){ //x values
         if(it != 0.0) //filter zeros
             x_std += pow(it - global_Xmean, 2); 
     }
-    x_std = x_std/num_points; //wichtig für relativen vergleich? --> eigl ausreichend nur die summe zu betrachten
+    x_std = x_std/num_points; //no sqrt() because we compare with sqrt(error)  
 
     for(auto &it : data[1]){ //y values
         if(it != 0.0) //filter zeros
             y_std += pow(it - global_Ymean, 2); 
     }
-    y_std = y_std/num_points; //wichtig für relativen vergleich?
+    y_std = y_std/num_points; //no sqrt() because we compare with sqrt(error)
 
     int local_points = data[0].size();
     if(data[0].size() != data[1].size())
@@ -118,7 +108,7 @@ void calc_partitionedStats(std::vector<std::vector<double>> data, std::vector<do
         if(data[0][i] != 0.0 && data[1][i] != 0.0) //filter zeros
             pearson += (data[0][i] - global_Xmean)*(data[1][i] - global_Ymean);
     }
-    pearson = pearson / (num_points * global_Xstd * global_Ystd); //? wichtig für relativen vergleich? --> nur summe btrachten reicht?
+    pearson = pearson / (num_points * global_Xstd * global_Ystd); 
 
     stats->at(0) = x_mean;
     stats->at(1) = y_mean;
@@ -166,7 +156,7 @@ bool check_Partitionedstats(std::vector<double>* stats1, std::vector<double>* st
             return false;
         }
     }
-    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,2)){
+    if(fabs(stats1->at(4) - stats2->at(4)) > pow(error,2)){ //we compare with sqrt(error) --> to obtain error we need to take error^2
         return false;
     }
     return true;
@@ -200,31 +190,7 @@ std::vector<std::vector<std::vector<double>>> partitionData(int num_threads, int
     return paddingData;
 }
 
-void printVector(std::vector<std::vector<std::vector<double>>> working_data){ //debugging
-    int j = 1;
-    int count = 0;
-    std::vector<std::string> names = {"x: ", "y: "};
-    for(auto &vec : working_data){
-        std::cout <<std::endl<< j << ". Vector: " << std::endl;
-        int i = 0;
-        for(auto &xyVec : vec){
-            int z = 0;
-            for( auto &vals : xyVec){
-                if(vals != 0){
-                    count++;
-                }
-                std::cout <<"["<<j<<"]"<<"["<<i<<"]"<<"["<<z<<"] "<< vals << " ";
-                if(z%9==0)
-                    std::cout<<std::endl;
-                z++;
-            }
-            i++;
-            std::cout<<std::endl; 
-        }
-        j++; 
-    }
-    // std::cout << "num points: " << count/2 << std::endl;
-}
+
 
 int count_nonzeros(std::vector<std::vector<double>> working_data, int padding){ //debugging
     int counts = 0;
@@ -260,23 +226,6 @@ std::vector<std::vector<double>> refactorData(std::vector<std::vector<std::vecto
     return working_data;    
 }
 
-void compareData(std::vector<std::vector<double>> vec1, std::vector<std::vector<double>>vec2){ //debuggen
-    std::vector<int> result;
-    if(vec1[0].size() != vec2[0].size() || vec1[1].size() != vec2[1].size())
-        std::cout << "output and input are incompatible!" << std::endl;
-    for(int i = 0; i < (int)vec1.size(); i++){
-        for(int j = 0; j < (int)vec1[0].size(); j++){
-            if(vec1[i][j] != vec2[i][j]){
-                result.push_back(j);
-            }
-        }
-        result.push_back(1111111);
-    }
-    std::cout << "indices with different values:" << std::endl;
-    for(auto &element : result){
-        std::cout << element << std::endl;
-    }
-}
 
 double get_MaxError(std::vector<double> init_stats, std::vector<double> final_stats){
     double max = 0.0;

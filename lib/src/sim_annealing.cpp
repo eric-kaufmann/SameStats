@@ -66,7 +66,6 @@ double sim_annealing(std::string shape, int threads, int serial_steps){  // all 
 
     std::vector<std::vector<std::vector<double>>> new_working_data; 
     new_working_data = partitionData(threads, padding, working_data); //create thread-wise data with padding in between to prevent false sharing
-    // printVector(new_working_data);
     auto start = std::chrono::high_resolution_clock::now(); 
     int check_portion = 0; //debug
     
@@ -77,7 +76,6 @@ double sim_annealing(std::string shape, int threads, int serial_steps){  // all 
         // bool rest_check;
 
         int toggle = 0;
-        // print_matrix(data_portion);
         // Calculate initial stats
         std::vector<double> init_stats(5); 
         std::vector<double> working_stats(5);
@@ -183,8 +181,6 @@ double sim_annealing(std::string shape, int threads, int serial_steps){  // all 
     std::cout << std::endl;
     std::cout << "elapsed time sim annealing: " << duration.count()*1e-9 << "s" << std::endl;
 
-    // print_matrix(result_data);
-    // compareData(working_data, result_data);
     double maxError = get_MaxError(global_stats, end_stats);
     if(save_data){
         std::string fn = "output_"+shape;

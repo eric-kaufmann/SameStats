@@ -17,8 +17,8 @@ As in the Paper [*Same Stats, Different Graphs: Generating Datasets with Varied 
 
 # Output
 This Version creates png files which display the plot of our pointcloud before the transformation and after. 
-Plot before transformation: input_shape_scatter_plot.png
-after: output_shape_scatter_plot.png
+Plot before transformation: input_'shape'_scatter_plot.png
+after: output_'shape'_scatter_plot.png
 
 # Speed up
 Compared to the python version of the above mentioned autodesk paper, this version is much faster.

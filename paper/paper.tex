@@ -187,7 +187,7 @@ $$
 
 Mittels dieser statistischen Eigenschaften lassen sich einige Aussagen über bildliche Darstellungen der Daten im zweidimensionalen Koordinatensystem treffen. Somit lässt sich vermuten, dass Datensätze, welche bis auf einen kleinen Fehler (z.B. bis auf die zweite Nachkommastelle genau), identische Mittelwerte, Standardabweichung und Korellationskoeffizienten haben, sehr ähnlich in der bildlichen Darstellung aussehen. Wie sich in den Ergebnissen zeigen lässt, ist dies jedoch nicht immer der Fall. Dabei muss erwähnt werden, dass der Korrelationskoeffizient nur den linearen Zusammenhang aufzeigt. Nichtlineare Abhängigkeiten sind jedoch häufig schwer korrekt abzubilden, sodass eine vereinfachte lineare Abbildung häufig bereits eine gute Approximation ist.
 
-TODO: Simmulated Annealing allowBrak() Umsetzung
+% TODO: Simmulated Annealing allowBrak() Umsetzung
 
 \subsection{Optimizations}\label{sec:algo:opti}
 
@@ -195,7 +195,7 @@ Der originale Programmiercode von Matejka und Fitzmaurice ist in der Programmier
 Um einen zusätzliche Optimierung zu erreichen wurde die Berechnung der minimalen Distanz von einem Punkt zum Targetdatensatz abgeändert. In der Originalversion wird der Targetdatensatz durch Linien definiert. Der kürzeste Abstand wird somit durch die Berechnung der Distanz von Punkt zu Linie durchgeführt. In der optimierten Version werden die Linien durch Punkte diskretisiert. Somit wird die Distanz von Punkt zu Punkt bestimmt, welches effizienter zu berechnen ist. Zusätzlich wird ermöglicht, dass durch eine größere Diskretisierung, d.h. weniger Punkte pro Linie, die Laufzeit zur Berechnung der minimalen Distanz weiter reduziert werden kann. Dabei muss jedoch beachtet werden, dass zu wenige Punkte zu einem schlechteren Ergebnis führen. Somit muss ein sinnvoller Trade-of erreicht werden.
 
 Als näschtes wurde mittels OpenMP versucht den seriellen C++-Programmiercode zu parallelisieren. Als Grundlage dafür wurde ein Divide-and-Conquer-Ansatz gewählt. Der Initiale Datensatz wird demnach gleichmäßig in so viele Teile Aufgeteilt, wie es Threads gibt. Anschließend wird der Iterationsschritt auf allen Teilen des Datensatzes parallel über alle Threads ausgeführt. Das bedeutet es werden somit gleichzeitig \textit{num\_threads} (Anzahl der Threads) Punkte zufällig ausgewählt, geshiftet, und die Statistiken berechnet. Somit könnte die Laufzeit idealisiert auf $\frac{1}{num\_threads}$ reduziert werden.
-Jedoch entstehen Probleme. Durch die Aufteilung des Datensatzes in Teildatensätze ist es schwierig 
+Jedoch entstehen Probleme. Durch die Aufteilung des Datensatzes in Teildatensätze ist es schwierig TODO
 
 
 
@@ -216,7 +216,7 @@ Die Experimente wurden dabei auf einem AMD Ryzen 7 6800 HS mit 8 Kernen und 16 T
 \paragraph{Experiment 1}
 
 Im ersten Experiment wurden alle drei Fälle über unterschiedlich vielen Iterationen ausgeführt. Dabei wurden 100'000, 200'000, 500'000 und 1'000'000 Iterationen als Ausgangslage verwendet. Die Zeiten wurden in Sekunden gemessen. Durch die große Anzahl der Iterationen wird gewährleistet, dass alle Algorithmen zu einer guten Lösung kommen. 
-Bei dem Fall \textit{C++/parallel} wurde die beste parallele Zeit verwendet, die erreicht werden konnte, ohne dass größere Verminderungen des Ergebnisses zur Folge gekommen sind. In diesem Fall wurden TODO: Anzahl Threads verwendet.
+Bei dem Fall \textit{C++/parallel} wurde die beste parallele Zeit verwendet, die erreicht werden konnte, ohne dass größere Verminderungen des Ergebnisses zur Folge gekommen sind. In diesem Fall wurden 8 Threads verwendet.
  Die Ergenisse für dieses Experimente sind in Tabelle \ref{tab:serpar} zu erkennen.
  
 \begin{table}[htbp]

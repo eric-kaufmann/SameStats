@@ -47,14 +47,16 @@
 %% The abstract is a short summary of the work to be presented in the article.
 \begin{abstract}
 
-The five-finger pattern \cite{macgilchrist2014}:
-\begin{enumerate}
-\item \textbf{Topic and background:} What topic does the paper deal with? What is the point of departure for your research? Why are you studying this now?
-\item \textbf{Focus:} What is your research question? What are you studying precisely?
-\item \textbf{Method:} What did you do?
-\item \textbf{Key findings:} What did you discover?
-\item \textbf{Conclusions or implications:} What do these findings mean? What broader issues do they speak to?
-\end{enumerate}
+% The five-finger pattern \cite{macgilchrist2014}:
+% \begin{enumerate}
+% \item \textbf{Topic and background:} What topic does the paper deal with? What is the point of departure for your research? Why are you studying this now?
+% \item \textbf{Focus:} What is your research question? What are you studying precisely?
+% \item \textbf{Method:} What did you do?
+% \item \textbf{Key findings:} What did you discover?
+% \item \textbf{Conclusions or implications:} What do these findings mean? What broader issues do they speak to?
+% \end{enumerate}
+
+In dieser Veröffentlichung wurden, basierend auf initialen zweidimensionalen Datensätzen, neue Datensätze generiert, welche bis auf einen Fehler die gleichen statistischen Eigenschaften: Mittelwert, Standardabweichung und Korrelationskoeffizient aufweisen. Dabei wurde ein paralleler Algorithmus entwurfen, welcher mittels Simmulated Annealing effizient zu einem Ergebnis kommt. Der originale Implementierung von Matejka und Fitzmaurice \cite{matejka2017same} wurde ineffizient mittels Python implementiert. Durch Verwendung der Programmiersprache C++ und einem parallelisierten Divide-and-Conquer-Ansatz wurde eine bis zu 390-fache Beschleunigung der Performance erreicht. 
 
 
 \end{abstract}
@@ -62,7 +64,7 @@ The five-finger pattern \cite{macgilchrist2014}:
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{entity resolution, data cleansing, programming contest}
+\keywords{statistics, simmulated annealing, mean, standard deviation, pearson coefficient}
 
 
 %%
@@ -83,17 +85,19 @@ Um Datensätze zu generieren, die bis auf einen bestimmten Fehler, die gleichen 
 
 \subsection{Related Work}
 
-Die Idee basiert auf auf der Veröffentlichung \textit{Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics through Simulated Annealing} von Matejka und Fitzmaurice. Dort wurde ein zweidimensionaler Datensätze mittels Simmulated Annealing auf eine Zielstruktur transformiert. Sowohl der initiale als auch der transformierte Datensatz wiesen dabei einen ähnlichen Mittelwert, eine ähnliche Standwardabweichung und ähnlichen Korrelationskoeffizient auf. Ähnlich wurde dort mit einer Gleichheit auf von bis zu zwei Nachkommastellen definiert.
+Die Idee basiert auf auf der Veröffentlichung \textit{Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics through Simulated Annealing} von Matejka und Fitzmaurice \cite{matejka2017same}. Dort wurde ein zweidimensionaler Datensätze mittels Simmulated Annealing auf eine Zielstruktur transformiert. Sowohl der initiale als auch der transformierte Datensatz wiesen dabei einen ähnlichen Mittelwert, eine ähnliche Standwardabweichung und ähnlichen Korrelationskoeffizient auf. Ähnlich wurde dort mit einer Gleichheit auf von bis zu zwei Nachkommastellen definiert.
 
 \subsection{Our Contributions}
 
-In dieser Veröffentlichen wurde nun die Idee von Matejka und Fitzmaurice aufgegriffen und optimiert. Anstatt den neuen Datensatz mittels Python zu gegerieren, wurde in dieser Arbeit versucht durch die Verwendung von C++ und OpenMP eine effizientere Lösung zu finden.  
+In dieser Veröffentlichen wurde nun die Idee von Matejka und Fitzmaurice\cite{matejka2017same} aufgegriffen und optimiert. Anstatt den neuen Datensatz mittels Python zu gegerieren, wurde in dieser Arbeit versucht durch die Verwendung von C++ und OpenMP eine effizientere Lösung zu finden.  
 
 %\subsection{Outline}
 
 
 
 \section{The Algorithm}\label{sec:algo}
+
+In diesem Abschnitt wird nun der Algorithmus erläutert. Dabei wird zunächst auf die Grundidee der Veröffentlichung von Matejka und Fitzmaurice\cite{matejka2017same} eingegangen und diese erläutert. Anschließend werdnen die Optimierungen an diesem Original beschrieben.
 
 \subsection{Algorithm description}\label{sec:algo:desc}
 
@@ -191,12 +195,29 @@ Mittels dieser statistischen Eigenschaften lassen sich einige Aussagen über bil
 
 \subsection{Optimizations}\label{sec:algo:opti}
 
-Der originale Programmiercode von Matejka und Fitzmaurice ist in der Programmiersprache Python verfasst und sollte keine Lösung in minimaler Laufzeit erreichen. In dieser Veröffentlichung wurde nun jedoch versucht diesen Algorithmus zu optimieren. Durch die Verwendung von C++ als Programmiersprache wird ein effizientes Speichermanagement, gute und einfache Möglichkeiten der Parallelisierung sowie Compileroptimierungen gewährleistet. Allein duch diese Änderungen wird ein großer Performance-Gewinn erhofft. 
+Der originale Programmiercode von Matejka und Fitzmaurice\cite{matejka2017same} ist in der Programmiersprache Python verfasst und sollte keine Lösung in minimaler Laufzeit erreichen. In dieser Veröffentlichung wurde nun jedoch versucht diesen Algorithmus zu optimieren. Durch die Verwendung von C++ als Programmiersprache wird ein effizientes Speichermanagement, gute und einfache Möglichkeiten der Parallelisierung sowie Compileroptimierungen gewährleistet. Allein duch diese Änderungen wird ein großer Performance-Gewinn erhofft. 
 Um einen zusätzliche Optimierung zu erreichen wurde die Berechnung der minimalen Distanz von einem Punkt zum Targetdatensatz abgeändert. In der Originalversion wird der Targetdatensatz durch Linien definiert. Der kürzeste Abstand wird somit durch die Berechnung der Distanz von Punkt zu Linie durchgeführt. In der optimierten Version werden die Linien durch Punkte diskretisiert. Somit wird die Distanz von Punkt zu Punkt bestimmt, welches effizienter zu berechnen ist. Zusätzlich wird ermöglicht, dass durch eine größere Diskretisierung, d.h. weniger Punkte pro Linie, die Laufzeit zur Berechnung der minimalen Distanz weiter reduziert werden kann. Dabei muss jedoch beachtet werden, dass zu wenige Punkte zu einem schlechteren Ergebnis führen. Somit muss ein sinnvoller Trade-of erreicht werden.
 
-Als näschtes wurde mittels OpenMP versucht den seriellen C++-Programmiercode zu parallelisieren. Als Grundlage dafür wurde ein Divide-and-Conquer-Ansatz gewählt. Der Initiale Datensatz wird demnach gleichmäßig in so viele Teile Aufgeteilt, wie es Threads gibt. Anschließend wird der Iterationsschritt auf allen Teilen des Datensatzes parallel über alle Threads ausgeführt. Das bedeutet es werden somit gleichzeitig \textit{num\_threads} (Anzahl der Threads) Punkte zufällig ausgewählt, geshiftet, und die Statistiken berechnet. Somit könnte die Laufzeit idealisiert auf $\frac{1}{num\_threads}$ reduziert werden.
-Jedoch entstehen Probleme. Durch die Aufteilung des Datensatzes in Teildatensätze ist es schwierig TODO
+Als nächstes wurde mittels OpenMP versucht den seriellen C++-Programmiercode zu parallelisieren. Als Grundlage dafür wurde ein Divide-and-Conquer-Ansatz gewählt. Der Initiale Datensatz wird demnach gleichmäßig in so viele Teile Aufgeteilt, wie es Threads gibt. Anschließend wird der Iterationsschritt auf allen Teilen des Datensatzes parallel über alle Threads ausgeführt. Das bedeutet es werden somit gleichzeitig \textit{num\_threads} = $n$ (Anzahl der Threads) Punkte zufällig ausgewählt, geshiftet, und die Statistiken berechnet. Somit könnte die Laufzeit idealisiert auf $\frac{1}{n}$ reduziert werden.
+Jedoch entstehen Probleme. Durch die Aufteilung des Datensatzes in Teildatensätze ist es schwierig die statistischen Eigenschaften zu berechnen, da sowohl für den Mittelwert, als auch der Standardabweichung alle Punkte des Datensatzes benötigt werden. Außerdem werden die statistischen Eigenschaften des gesamten Datensatzes benötigt, um eine Entscheidung treffen zu können, ob ein geshifteter Punkt zum Datensatz hinzugefügt werden soll oder nicht.  
 
+Um dieses Problem zu lösen spalten wir den maximalen Fehler, welcher entstehen kann auf. Angenommen wir haben einen maximalen Fehler $e_{ges}$, welcher eingehalten werden muss, dass ein Punkt zum Datensatz hinzugefügt werden kann. Die Fehler der einzelnen Teildatensätze sind durch $e_i$ definiert. Dabei muss gelten:
+
+$$
+e_{ges} \geq \sum_{i=1}^{n} e_i
+$$
+
+Um nun zu erreichen, dass alle Einschränkungen eingehalten werden wird der Fehler ebenfalls aufgeteilt:
+
+$$
+e_i \leq \frac{e_{ges}}{n} ~ \forall i = 1, \dots, n
+$$
+
+Somit kann gewährleistet werden, dass der Gesamtfehler immer eingehalten wird. Nachteil ist, dass somit ein an sich kleiner Fehler nur akzeptiert werden kann, da diese Aufteilung davon ausgeht, dass alle Teilfehler maximal ausgereizt werden. 
+
+Das nächste Problem ist die Berechnung des Teilfehlers, denn bei der Berechnung des Mittelwertes und der Standardabweichung wird durch die Anzahl der Daten $N$ durch die Anzahl der Daten des Teildatensatzes $\frac N n$ ersetzt. Somit werden aber auf die Freiheitsgrade eingeschränkt, d.h. die statistischen Eigenschaften sind ungenauer und fehleranfälliger.
+
+Insgesamt besteht das Problem, dass durch die Aufteilung das Problem schwieriger wird, da der Fehler stärker beschränkt wird. Dennoch kann durch die Aufteilung des Problems in Subprobleme sinnvoll sein, da so mehr Iterationen in gleicher Zeit durchgeführt werden können.
 
 
 \section{Experiments}\label{sec:exp}
@@ -206,7 +227,7 @@ Im folgenden Abschnitt wird nun betrachtet, welche Auswirkungen die Optimierung 
 Verglichen werden dabei folgende Fälle:
 
 \begin{itemize}
-  \item der serielle Python Algorithmus aus der Publikation von Matejka und Fitzmaurice, welches die Implementierung ist, auf welcher die neue Umsetzung basiert. 
+  \item der serielle Python Algorithmus aus der Publikation von Matejka und Fitzmaurice\cite{matejka2017same}, welches die Implementierung ist, auf welcher die neue Umsetzung basiert. 
   \item der Algorithmus umgeschrieben in C++ und seriell ausgeführt. Somit kann betrachtet werden, welchen Unterschied die Verwendung einer anderen Programmiersprache macht.
   \item der gleiche Algorithmus in C++, jedoch nun parallelisiert mit den Optimierungen aus Abschnitt \ref{sec:algo:opti} ausgeführt.
 \end{itemize}
@@ -269,67 +290,9 @@ Dabei lässt sich gut erkennen, dass das Problem mit mehr Threads, die parallel 
 Somit bestätigen die Experimente die Ziele eine effizientere Generierung eines Datensatzes mit ähnlichen statistischen Eigenschaften zu ermöglichen.   
 
 
-
-% \subsection{Internal Representation of Mock Labels}
-% \label{sub:sec:internal}
-
-% In Figure~\ref{fig:integer:sets} we convert the mock labels to sorted integer sets.
-
-
-
-% \begin{figure}[htbp]
-%   \centering
-%   \includegraphics[width=\linewidth]{./graphics/integer_sets.pdf}
-%   \caption{Conversion of mock camera labels to sorted integer sets. 
-% We map each unique token (key) in camera labels to a unique value. 
-% Based on these key-value-mappings, we convert camera labels to sorted integer sets. 
-% A camera can have different names in different countries. Therefore, repeating IDs reference the same cameras (see, for example, ID=3).} 
-%   \label{fig:integer:sets}
-% \end{figure}
-
-% \subsection{Efficient Preprocessing of Input Data}
-% \label{sub:sec:preprocessing}
-
-% The following findings are important to speed up preprocessing of the input data:
-
-% \begin{itemize}
-% \item Reading many small files concurrently, with multiple threads (compared to a single thread), takes advantage of the internal parallelism of SSDs and thus leads to higher throughput \cite{Zhuang2016}.
-
-% \item C-string manipulation functions are often significantly faster than their C++ pendants. For example, locating substrings with \texttt{strstr} is around five times faster than using the C++ \texttt{std::string} function \texttt{find}.
-
-% \item Hardcoding regular expressions with \emph{while, for, switch} or \emph{if-else} statements results in faster execution times than using standard RegEx libraries, where regular expressions are compiled at runtime into state machines.
-
-% \item Changing strings in place, instead of treating them as immutable objects, eliminates allocation and copying overhead.
-
-% \end{itemize}
-
-
-% \section{Experiments}
-
-% Table~\ref{tab:results} shows the running times of the resolution step of the five best placed teams.
-
-
-% \begin{table}[htbp]
-%   \caption{Comparison of the F-measure and the running times of the resolution step of the five best placed teams. The input data for the resolution step consisted of 29{,}787 in JSON formatted e-commerce websites. Measurements were taken on a
-% laptop running Ubuntu 19.04 with 16 GB of RAM and two Intel Core i5-4310U CPUs. The underlying SSD was a 500\,GB 860 EVO mSATA. We cleared the page cache, dentries, and inodes before each run to avoid reading the input data from RAM instead of the SSD.}
-%   \label{tab:results}
-% \resizebox{\columnwidth}{!}{
-%   \begin{tabular}{lcrr}
-%     \toprule
-%     Team& Language & F-measure & Running time (s)\\
-%     \midrule
-% 	PictureMe (\textbf{this paper}) &C++& 0.99 & \textbf{0.61}\\
-%     DBGroup@UniMoRe &Python& 0.99 & 10.65\\
-%     DBGroup@SUSTech &C++& 0.99 & 22.13\\
-%     eats\_shoots\_and\_leaves &Python& 0.99 & 28.66\\
-%     DBTHU &Python& 0.99& 63.21\\
-%   \bottomrule
-% \end{tabular}
-% }
-% \end{table}
-
-
 \section{Conclusions}
+
+Zusammenfassend wurde  in dieser Veröffentlichung gezeigt, dass man effizient aus zweidimensionalen Datensätzen neue Datensätze erstellen kann mit ähnlichen statistischen Eigenschaften. Dabei wurde experimentell gezeigt, dass allein die Verwendung einer anderen effizienteren Programmiersprache, wie C++, es erlaubt einen enormen Gewinn der Laufzeit zu erreichen. Durch Parallelisierung mit dem Divide-and-Conquer-Ansatz kann die Laufzeit erneut, je nach Anzahl der Threads, geviertelt werden. Dabei ist dieser Performance-Gewinn stetig über eine variable Anzahl an Iterationen. 
 
 %%
 %% The next two lines define the bibliography style to be used, and

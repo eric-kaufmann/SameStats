@@ -56,7 +56,7 @@
 % \item \textbf{Conclusions or implications:} What do these findings mean? What broader issues do they speak to?
 % \end{enumerate}
 
-In dieser Veröffentlichung wurden, basierend auf initialen zweidimensionalen Datensätzen, neue Datensätze generiert, welche bis auf einen Fehler die gleichen statistischen Eigenschaften: Mittelwert, Standardabweichung und Korrelationskoeffizient aufweisen. Dabei wurde ein paralleler Algorithmus entwurfen, welcher mittels Simmulated Annealing effizient zu einem Ergebnis kommt. Der originale Implementierung von Matejka und Fitzmaurice \cite{matejka2017same} wurde ineffizient mittels Python implementiert. Durch Verwendung der Programmiersprache C++ und einem parallelisierten Divide-and-Conquer-Ansatz wurde eine bis zu 390-fache Beschleunigung der Performance erreicht. 
+In dieser Veröffentlichung wurden, basierend auf initialen zweidimensionalen Datensätzen, neue Datensätze generiert, welche bis auf einen Fehler die gleichen statistischen Eigenschaften (Mittelwert, Standardabweichung und Korrelationskoeffizient) aufweisen. Dabei wurde ein paralleler Algorithmus entworfen, welcher mittels Simmulated Annealing effizient zu einem Ergebnis kommt. Die originale Implementierung von Matejka und Fitzmaurice \cite{matejka2017same} wurde in Python geschrieben und ist daher ineffizient. Durch Verwendung der Programmiersprache C++ und einem parallelisierten Divide-and-Conquer-Ansatz wurde eine bis zu 390-fache Beschleunigung der Performance erreicht. 
 
 
 \end{abstract}
@@ -64,7 +64,7 @@ In dieser Veröffentlichung wurden, basierend auf initialen zweidimensionalen Da
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{statistics, simmulated annealing, mean, standard deviation, pearson coefficient}
+\keywords{statistics, simmulated annealing, mean, standard deviation, pearson coefficient, visualization}
 
 
 %%
@@ -77,11 +77,11 @@ In dieser Veröffentlichung wurden, basierend auf initialen zweidimensionalen Da
 
 \section{Introduction}
 
-In der Statistik ist die Analyse von Datensätzen maßgeblich. Bei besonders großen bzw. komplex strukturierten Datenmengen ist es häufig schwierig die Daten sinnvoll zu visualisieren. Demnach wird der Datensatz nur von Eigenschaften, wie dem Mittelwert oder der Standardabweichung, klassifiziert. Dabei können Datensätze, die sich visuell kaum ähnlich sind, dennoch nahezu identische statistische Eigenschaften aufweisen. 
+In der Statistik ist die Analyse von Datensätzen maßgeblich. Bei besonders großen bzw. komplex strukturierten Datenmengen ist es häufig schwierig die Daten sinnvoll zu visualisieren. Demnach wird der Datensatz nur von Eigenschaften, wie dem Mittelwert oder der Standardabweichung, charakterisiert. Dabei können Datensätze, die sich visuell kaum ähnlich sind, dennoch nahezu identische statistische Eigenschaften aufweisen.  
 
 \subsection{Background}
 
-Um Datensätze zu generieren, die bis auf einen bestimmten Fehler, die gleichen statistischen Eigenschaften aufweist, wird der Ansatz des Simmulated Annealing verwendet. Die Idee ist dabei iterativ ein Problem näher an seine Optimallösung zu bringen. Es wird dabei akzeptiert, dass man am Anfang größere Fehler zulässt, diese Toleranz (Temperatur) jedoch über die Interationen nachlässt. Das heißt, das nach jeder Iteration die erlaubte Veränderung gedämpft wird, sodass man exakter die Lösung approximieren kann.
+Um Datensätze zu generieren, die bis auf einen bestimmten Fehler die gleichen statistischen Eigenschaften aufweisen, wird der Ansatz des Simmulated Annealing verwendet. Die Idee ist, iterativ ein Problem näher an seine Optimallösung zu bringen. Es wird dabei akzeptiert, dass am Anfang größere Fehler zugelassen werden, diese Toleranz (Temperatur) jedoch über den Verlauf des Algorithmus nachlässt. Somit beschränkt sich der Algorithmus nicht nur auf lokale Optimallösungen, sondern deckt ein weites Optimierungsgebiet ab. Es kann daher eine globale Optimallösung erreicht werden. 
 
 \subsection{Related Work}
 
@@ -112,10 +112,10 @@ Der Ablauf der Transformation in in Algorithmus~\ref{alg:transform} dargestellt.
 
 Die Ausgabe des Agorithmus ist der transformierte Datensatz, welcher bis auf einen Fehler die gleichen statistischen Eigenschaften aufweist, jedoch visuell dem Targetdatensatz ähnelt. 
 
-Der Grundlegende Ablauf eines Iterationsschrittes ist dabei wie folgt. Zunächst wird ein zufälliger Punkt aus dem initialen Datensatz ausgewählt. Das Ziel ist, dass dieser so verschoben wird, dass die statistischen eigenschaften beibehalten werden, er jedoch näher an dem Targetdatensatz liegt. Demnach wird der Punkt zufällig in eine Richtung geshifted. 
+Der Grundlegende Ablauf eines Iterationsschrittes ist dabei wie folgt: Zunächst wird ein zufälliger Punkt aus dem initialen Datensatz ausgewählt. Das Ziel ist, dass dieser so verschoben wird, dass die statistischen Eigenschaften beibehalten werden, er jedoch näher an dem Targetdatensatz liegt. Demnach wird der Punkt zufällig in eine Richtung geshifted. 
 Dann wird kontrolliert, ob das Shiften den Punkt näher an den Targetdatensatz gebracht hat. Ist er nicht näher, hat er trotzdem die Chance zufällig akzeptiert zu werden. Die Wahrscheinlichkeit wird durch die Temperatur gesteuert. 
 Wird er auch da nicht akzeptiert, dann wird er erneut zufällig geshifted. Dies wird solange wiederholt, bis mindestens eine der beiden Bedingungen erfüllt ist. 
-Nun wird kontrolliert, ob der Datensatz mit dem neuen geshifteten Punkt immernoch, bis auf einen Fehler, die gleichen statistischen Eigenschaften aufweist, wie der initiale Datensatz. Wenn nein, dann wird der Punkt verworfen und der nächste Iterationsschritt wird gestaret. Wenn die Eigenschaften übereinstimmen, dann wird der neue geshiftet Punkt Teil des Datensatzes und der nächste Iterationsschritt wird gestartet. 
+Nun wird kontrolliert, ob der Datensatz mit dem neuen geshifteten Punkt immernoch, bis auf einen festgelgeten Fehler, die gleichen statistischen Eigenschaften aufweist, wie der initiale Datensatz. Wenn nicht, dann wird der Punkt verworfen und der nächste Iterationsschritt wird gestaret. Wenn die Eigenschaften übereinstimmen, dann wird der neue geshiftet Punkt Teil des Datensatzes und der nächste Iterationsschritt wird gestartet. 
 
 
 \begin{algorithm}
@@ -189,19 +189,23 @@ Korr(x,y)= \frac{
 }.
 $$
 
-Mittels dieser statistischen Eigenschaften lassen sich einige Aussagen über bildliche Darstellungen der Daten im zweidimensionalen Koordinatensystem treffen. Somit lässt sich vermuten, dass Datensätze, welche bis auf einen kleinen Fehler (z.B. bis auf die zweite Nachkommastelle genau), identische Mittelwerte, Standardabweichung und Korellationskoeffizienten haben, sehr ähnlich in der bildlichen Darstellung aussehen. Wie sich in den Ergebnissen zeigen lässt, ist dies jedoch nicht immer der Fall. Dabei muss erwähnt werden, dass der Korrelationskoeffizient nur den linearen Zusammenhang aufzeigt. Nichtlineare Abhängigkeiten sind jedoch häufig schwer korrekt abzubilden, sodass eine vereinfachte lineare Abbildung häufig bereits eine gute Approximation ist.
+Mittels dieser statistischen Eigenschaften lassen sich einige Aussagen über bildliche Darstellungen der Daten im zweidimensionalen Koordinatensystem treffen. Somit lässt sich vermuten, dass Datensätze, welche bis auf einen kleinen Fehler (z.B. bis auf die zweite Nachkommastelle genau), identische Mittelwerte, Standardabweichung und Korellationskoeffizienten haben, sehr ähnlich in der bildlichen Darstellung aussehen. Wie sich in den Ergebnissen zeigen lässt, ist dies jedoch nicht zwangsläufig der Fall. Dabei muss erwähnt werden, dass der Korrelationskoeffizient nur den linearen Zusammenhang aufzeigt. Nichtlineare Abhängigkeiten sind jedoch häufig schwer korrekt abzubilden, sodass eine vereinfachte lineare Abbildung häufig bereits eine gute Approximation ist.
 
 % TODO: Simmulated Annealing allowBrak() Umsetzung
 
 \subsection{Optimizations}\label{sec:algo:opti}
 
-Der originale Programmiercode von Matejka und Fitzmaurice\cite{matejka2017same} ist in der Programmiersprache Python verfasst und sollte keine Lösung in minimaler Laufzeit erreichen. In dieser Veröffentlichung wurde nun jedoch versucht diesen Algorithmus zu optimieren. Durch die Verwendung von C++ als Programmiersprache wird ein effizientes Speichermanagement, gute und einfache Möglichkeiten der Parallelisierung sowie Compileroptimierungen gewährleistet. Allein duch diese Änderungen wird ein großer Performance-Gewinn erhofft. 
-Um einen zusätzliche Optimierung zu erreichen wurde die Berechnung der minimalen Distanz von einem Punkt zum Targetdatensatz abgeändert. In der Originalversion wird der Targetdatensatz durch Linien definiert. Der kürzeste Abstand wird somit durch die Berechnung der Distanz von Punkt zu Linie durchgeführt. In der optimierten Version werden die Linien durch Punkte diskretisiert. Somit wird die Distanz von Punkt zu Punkt bestimmt, welches effizienter zu berechnen ist. Zusätzlich wird ermöglicht, dass durch eine größere Diskretisierung, d.h. weniger Punkte pro Linie, die Laufzeit zur Berechnung der minimalen Distanz weiter reduziert werden kann. Dabei muss jedoch beachtet werden, dass zu wenige Punkte zu einem schlechteren Ergebnis führen. Somit muss ein sinnvoller Trade-of erreicht werden.
+Der originale Programmiercode von Matejka und Fitzmaurice\cite{matejka2017same} ist in der Programmiersprache Python verfasst und sollte keine Lösung in minimaler Laufzeit erreichen. In dieser Veröffentlichung wurde nun jedoch versucht diesen Algorithmus zu optimieren. Durch die Verwendung von C++ als Programmiersprache wird ein effizientes Speichermanagement, gute und einfache Möglichkeiten der Parallelisierung sowie Compileroptimierungen gewährleistet. Außerdem wird durch das Ausführen eines fertig kompilierten Programms bereits viel Zeit gespart, während bei Python noch ein Interpreter im Hintergrund Quellcode zur Laufzeit übersetzt. Allein durch diese Änderungen wird ein großer Performance-Gewinn erhofft. 
+Um eine zusätzliche Optimierung zu erreichen, wurden ein paar pragmatische Änderungen vorgenommen, um eine Parallelisierung zu ermöglichen. So wurde sich auf das Berechnen von Punkt-zu-Punkt Abständen beschränkt, während das Original Punkt-zu-Gerade Abstände betrachtet. Die Shapes wurden in dieser Version durch eine Punktewolke approximiert und der Datensatz wurde an das Shape angenähert, indem Punkt-zu-Punkt Abstände des Datensatzes zur Shape-Punktewolke minimiert wurden. Dies ermöglicht eine einheitliche Funktion zur Abstandsberechnung und es müssen daher keine Linien definiert werden, mit denen Punkt-zu-Gerade Abstände berechnet werden.   
 
-Als nächstes wurde mittels OpenMP versucht den seriellen C++-Programmiercode zu parallelisieren. Als Grundlage dafür wurde ein Divide-and-Conquer-Ansatz gewählt. Der Initiale Datensatz wird demnach gleichmäßig in so viele Teile Aufgeteilt, wie es Threads gibt. Anschließend wird der Iterationsschritt auf allen Teilen des Datensatzes parallel über alle Threads ausgeführt. Das bedeutet es werden somit gleichzeitig \textit{num\_threads} = $n$ (Anzahl der Threads) Punkte zufällig ausgewählt, geshiftet, und die Statistiken berechnet. Somit könnte die Laufzeit idealisiert auf $\frac{1}{n}$ reduziert werden.
-Jedoch entstehen Probleme. Durch die Aufteilung des Datensatzes in Teildatensätze ist es schwierig die statistischen Eigenschaften zu berechnen, da sowohl für den Mittelwert, als auch der Standardabweichung alle Punkte des Datensatzes benötigt werden. Außerdem werden die statistischen Eigenschaften des gesamten Datensatzes benötigt, um eine Entscheidung treffen zu können, ob ein geshifteter Punkt zum Datensatz hinzugefügt werden soll oder nicht.  
 
-Um dieses Problem zu lösen spalten wir den maximalen Fehler, welcher entstehen kann auf. Angenommen wir haben einen maximalen Fehler $e_{ges}$, welcher eingehalten werden muss, dass ein Punkt zum Datensatz hinzugefügt werden kann. Die Fehler der einzelnen Teildatensätze sind durch $e_i$ definiert. Dabei muss gelten:
+% die Berechnung der minimalen Distanz von einem Punkt zum Targetdatensatz abgeändert. In der Originalversion wird der Targetdatensatz durch Linien definiert. Der kürzeste Abstand wird somit durch die Berechnung der Distanz von Punkt zu Linie durchgeführt. In der optimierten Version werden die Linien durch Punkte diskretisiert. Somit wird die Distanz von Punkt zu Punkt bestimmt, welches effizienter zu berechnen ist. Zusätzlich wird ermöglicht, dass durch eine größere Diskretisierung, d.h. weniger Punkte pro Linie, die Laufzeit zur Berechnung der minimalen Distanz weiter reduziert werden kann. Dabei muss jedoch beachtet werden, dass zu wenige Punkte zu einem schlechteren Ergebnis führen. Somit muss ein sinnvoller Trade-off erreicht werden.
+
+Als nächstes wurde mittels OpenMP versucht, den seriellen C++-Programmiercode zu parallelisieren. Als Grundlage dafür wurde ein Divide-and-Conquer-Ansatz gewählt. Der initiale Datensatz wird demnach gleichmäßig in so viele Teile aufgeteilt, wie es Threads gibt (jedoch mit einem Maximum von 8). Anschließend wird der Iterationsschritt auf allen Teilen des Datensatzes parallel über alle Threads ausgeführt. Das bedeutet es werden somit gleichzeitig \textit{num\_threads} = $n$ (Anzahl der Threads) Punkte zufällig ausgewählt, geshiftet, und die Statistiken berechnet. Beim Aufteilen wurde noch mittels Padding versucht, dass die Daten für jeden Thread in eigenen Adressbereichen liegen. Dadurch soll false sharing vermieden werden.  
+Die Laufzeit könnte somit idealisiert auf $\frac{1}{n}$ reduziert werden.
+Jedoch entstehen dabei neue Herausforderungen. Um wirklich unabhägig zwischen Threads rechnen zu können, kann nicht bei jedem Shift in einer Teilgruppe die Statistik des gesamten Datensatzes ausgewertet werden. Statistiken müssen also auch gruppenspezifisch berechnet werden. Es wird daher in jeder Gruppe der Beitrag zur Gesamtstatistik berechnet und versucht diesen Beitrag nach einem Shift gleich zu halten. Der Mittelwert, die Standardabweichung und der Korrelationskoeffizient wurden dafür so transformiert, dass sie sich aus einer Summe zusammensetzen. Wenn sich Teilsummen einer Summe nicht verändern, dann bleibt die Gesamtsumme auch gleich. 
+ 
+Der maximale Fehler, welcher entstehen darf wird also auf die einzelnen Gruppen aufgeteilt. Angenommen wir haben einen maximalen Fehler $e_{ges}$, welcher eingehalten werden muss, damit ein Punkt zum Datensatz hinzugefügt werden kann. Die Fehler der einzelnen Teilgruppen sind durch $e_i$ definiert. Dabei muss gelten:
 
 $$
 e_{ges} \geq \sum_{i=1}^{n} e_i
@@ -215,10 +219,10 @@ $$
 
 Somit kann gewährleistet werden, dass der Gesamtfehler immer eingehalten wird. Nachteil ist, dass somit ein an sich kleiner Fehler nur akzeptiert werden kann, da diese Aufteilung davon ausgeht, dass alle Teilfehler maximal ausgereizt werden. 
 
-Das nächste Problem ist die Berechnung des Teilfehlers, denn bei der Berechnung des Mittelwertes und der Standardabweichung wird durch die Anzahl der Daten $N$ durch die Anzahl der Daten des Teildatensatzes $\frac N n$ ersetzt. Somit werden aber auf die Freiheitsgrade eingeschränkt, d.h. die statistischen Eigenschaften sind ungenauer und fehleranfälliger.
+Problematisch an dem Divide-and-Conquer Ansatz ist zudem, dass eine Aufteilung in Teildatensätze den Freiheitsgrad einzelner Punkte beim Shiften einschränkt. Wenn ein Punkt in einer kleinen Gruppe verschoben wird, dann ist diese Veränderung sehr einflussreich auf die Gesamtstatistik der Gruppe. Ein Shift in einer großen Gruppe hingegen fällt kaum ins Gewicht der Gesamtstatistik. Shifts in kleineren Gruppen können also weniger häufig akzeptiert werden. Daher wurde in dieser Arbeit auch die Anzahl der maximalen Threads auf 8 beschränkt, weil das Ergebnis bei noch kleineren Gruppen zu schlecht ausfällt und das angestrebte Shape kaum zu erkennen war. Daher hat dieser Ansatz einen Trade-off von Geschwindigkeit und Genauigkeit zur Folge. 
 
-Insgesamt besteht das Problem, dass durch die Aufteilung das Problem schwieriger wird, da der Fehler stärker beschränkt wird. Dennoch kann durch die Aufteilung des Problems in Subprobleme sinnvoll sein, da so mehr Iterationen in gleicher Zeit durchgeführt werden können.
 
+%bisschen umschreiben
 
 \section{Experiments}\label{sec:exp}
 
@@ -285,14 +289,14 @@ Die Ergebnisse des zweiten Experiments sind in Tabelle \ref{tab:par} aufgelistet
 }
 \end{table}
 
-Dabei lässt sich gut erkennen, dass das Problem mit mehr Threads, die parallel ausgeführt werden, schneller die Iterationen abarbeiten kann. Die Anzahl der Threads hat somit einen Einfluss auf die Laufzeit des Algorithmus. Dabei ist der Geschwindigkeitszuwachs anscheinend kaum von der Anzahl der Iterationen abhängig. Das bedeutet, dass über alle Iterationen ein Geschwindigkeitszuwachs von 1.5 bis 2 bei Verdoppelung der Threads angenommen werden kann. Dabei muss beachtet werden, dass Lösung des Problems bei vielen Threads and Genauigkeit verliert. Das liegt an den fehlenden Freiheitsgraden. Somit werden, um ähnlich gute Ergebnisse zu erreichen, mehr Iterationen benötigt, je mehr Threads verwendet werden. Demnach muss ein Trade-off auf Anzahl der Threads und Iterationen gefunden werden.
+Dabei lässt sich gut erkennen, dass das Problem mit mehr Threads, die parallel ausgeführt werden, schneller die Iterationen abarbeiten kann. Die Anzahl der Threads hat somit einen Einfluss auf die Laufzeit des Algorithmus. Dabei ist der Geschwindigkeitszuwachs anscheinend kaum von der Anzahl der Iterationen abhängig. Das bedeutet, dass über alle Iterationen ein Geschwindigkeitszuwachs von 1.5 bis 2 bei Verdoppelung der Threads angenommen werden kann. Dabei muss beachtet werden, dass die Lösung des Problems bei vielen Threads an Genauigkeit verliert. Das liegt an den fehlenden Freiheitsgraden beim Shiften. Somit werden, um ähnlich gute Ergebnisse zu erreichen, mehr Iterationen benötigt, je mehr Threads verwendet werden. Demnach muss ein Trade-off aus Anzahl der Threads und Iterationen gefunden werden.
 
 Somit bestätigen die Experimente die Ziele eine effizientere Generierung eines Datensatzes mit ähnlichen statistischen Eigenschaften zu ermöglichen.   
 
 
 \section{Conclusions}
 
-Zusammenfassend wurde  in dieser Veröffentlichung gezeigt, dass man effizient aus zweidimensionalen Datensätzen neue Datensätze erstellen kann mit ähnlichen statistischen Eigenschaften. Dabei wurde experimentell gezeigt, dass allein die Verwendung einer anderen effizienteren Programmiersprache, wie C++, es erlaubt einen enormen Gewinn der Laufzeit zu erreichen. Durch Parallelisierung mit dem Divide-and-Conquer-Ansatz kann die Laufzeit erneut, je nach Anzahl der Threads, geviertelt werden. Dabei ist dieser Performance-Gewinn stetig über eine variable Anzahl an Iterationen. 
+Zusammenfassend wurde  in dieser Veröffentlichung gezeigt, dass man effizient aus zweidimensionalen Datensätzen neue Datensätze erstellen kann mit ähnlichen statistischen Eigenschaften. Dabei wurde experimentell gezeigt, dass allein die Verwendung einer anderen effizienteren Programmiersprache, wie C++, es erlaubt die Laufzeit enorm zu reduzieren. Durch Parallelisierung mit dem Divide-and-Conquer-Ansatz kann die Laufzeit erneut, je nach Anzahl der Threads, geviertelt werden. Dabei ist dieser Performance-Gewinn stetig über eine variable Anzahl an Iterationen. 
 
 %%
 %% The next two lines define the bibliography style to be used, and
